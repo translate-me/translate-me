@@ -1,31 +1,31 @@
-## ----------------------- Modelo Conversasional ----------------------
+##----------------------- Conversasional Template ----------------------
 
-* ** Estou enviando um ... **
-   - [ ] Erro
-   - [] Pedido de nova funcionalidade
-   - [] Precisando de suporte
-
-
-* ** Deseja solicitar um * recurso * ou relatar um * bug *? **
+* **Estou enviando um ...**
+  - [ ] Bug
+  - [ ] Requisição de nova funcionalidade
+  - [ ] Necessitando suporte
 
 
-
-* ** Qual é o comportamento atual? **
+* **Você quer requisitar uma *feature* ou reportar um *bug*?**
 
 
 
-* ** Qual é o comportamento esperado? **
+* **Qual o comportamento atual?**
 
 
 
-* ** Qual é o caso da motivação / uso para mudar o comportamento? **
+* **Qual o comportamento esperado?**
 
 
 
-* ** Por favor, conte-nos sobre o seu ambiente: **
+* **Qual é o caso de motivação / uso para mudar o comportamento?**
 
-     Python: x.w.z </ br>
-     Versão: y x.y.z </ br>
-     Algo importante: Modelo W </ br>
 
-* ** Outras informações **
+
+* **Por favor, conte-nos sobre o seu ambiente:**
+
+    Python: x.w.z </br>
+    Versão: y x.y.z </br>
+    Alguma coisa importante: Modelo W </br>
+
+* **Outras Informações**
