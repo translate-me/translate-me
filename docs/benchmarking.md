@@ -30,10 +30,32 @@ assemelham-se pouco com o Translate me.
 #### 3.1 [SLD Trados](https://www.sdltrados.com/)
 
 <b> O que é </b> <br>
+É uma plataforma que traduz textos através do trabalho de tradutores
+_freelanceres_ e do uxílio de um software chamado
+_Computer Assisted Translation_ (CAT).
+
 <br> <b> Pontos em comum </b> <br>
+Possui o serviço de freelancer e também é pago por aqueles que desejam ter
+seus textos traduzidos. Além disso, possui a opção de traduzir vários textos
+simultâneamente. O usuário que deseja ter seu texto traduzido paga pelo
+serviço.
+
 <br> <b> Pontos divergentes </b> <br>
+Contém extensões para áreas como tradução de jogos e machine learning. O
+pagamento é feito pela assinatura da conta, e não por texto traduzido. Além
+disso, o Translate me é voltado para artigos acadêmicos, enquanto o SLD Trados
+é utilizado para traduzir textos em geral.
+
 <br> <b> Pontos Positivos </b> <br>
+Possui uma extensão chamada _AdaptiveMT_, onde um software com machine learning
+aprende com o tradutor mais sobre o idioma e faz sugestões gramaticais no
+decorrer da tradução. A extensão SLD Passolo permite a tradução específica
+para softwares de jogos. <br>
+
 <br> <b> Pontos Negativos </b> <br>
+Caso o usuário pretenda utilizar a plataforma uma única vez, ele acaba pagando
+pelo uso do software por um ano, e não por unidade de serviço prestado.
+
 
 #### 3.2 [WordFast](https://www.wordfast.net/)
 <b> O que é </b> <br>
