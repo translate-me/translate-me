@@ -1,5 +1,5 @@
 ---
-name: Nova documentão
+name: Documentação
 about: Crie um novo documento para translateme docs
 title: 'DOC - '
 labels: 'Documentation'
