@@ -1,18 +1,28 @@
-## Descrição - _<O que esta solicitação pull faz?>_
-Breve descrição de quais arquivos foram alterados e por que cada alteração.
-Esta seção pode ser escrita usando alterações de arquivo.
+<!-- Coloque um título objetivo das alterações feitas (geralmente, o nome da issue é suficiente) -->
 
-[Referência para US/UC] (#)
+## Issue #<numero> <tipo da issue>
+<!-- Faça a ligação com a respectivia issue associada a esse pull request
+ -->
+## Descrição
+<!-- Descreva em detalhes quais alterações foram feitas -->
 
-## Por que este pedido de Pull Request é necessário?
-Explique por que o PR é necessário, por exemplo:
-_fixar uma funcionalidade crucial_
+## Screenshots (se aplicável)
+<!-- Caso considere viável a apresentação visual das mudanças(uma nova funcionalidade em uma página, por exemplo) -->
+<!-- Caso não considere, apenas apague este tópico -->
 
-## Critério
+## Tipos de mudanças
 
-Ex:
-- [x] Testes criados.
-- [x] testes passando.
-- [x] build passando.
+- [ ] Correção de bugs
+- [ ] Nova funcionalidade
+- [ ] Documentação
 
-Resolva #Numero_da_Issue.
+## Checklist
+
+- [ ] Meu código segue a folha de estilo do projeto
+- [ ] Realizei os testes necessários
+- [ ] Minhas alterações requerem mudanças na documentação
+- [ ] Eu atualizei a documentação de acordo
+
+<!-- Quer tornar sua experiência mais divertida? Tente fazer um pull request com uma selfie!! ^^ -->
+
+<!--- Um pluglin chrome para selfies pode ser encontrado em https://github.com/thieman/github-selfies -->
