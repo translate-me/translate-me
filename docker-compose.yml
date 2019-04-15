@@ -3,7 +3,7 @@ version: '3'
 services:
   db: 
     image: postgres
-    container_name: db
+    container_name: translate_db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -14,13 +14,13 @@ services:
 
   django:
     build: ./api
-    container_name: django
+    container_name: django_translate
     command: ash docker-entrypoint.sh
     volumes:
       - ./api:/api
     environment:
       HOST_SERVER: ${HOST_SERVER}
     ports:
-      - "8080:8080"
+      - "9000:9000"
     depends_on:
       - db
