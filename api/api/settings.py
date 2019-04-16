@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 import socket
 
-HOST_BASE = socket.gethostbyname('frontend')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -27,7 +26,7 @@ SECRET_KEY = '8**mi99mqoel27u6&*ud9u=l6ui+pr_gu_lrgj%jez4&y4t89('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', HOST_BASE]
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -57,8 +56,6 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = [
-       'localhost:3000',
-        HOST_BASE + ':3000',
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -88,9 +85,10 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
+        'NAME': 'translate-db',
+        'USER': 'admin',
+        'PASSWORD': 'translate-me-pass',
+        'HOST': 'translate_db',
         'PORT': 5432,
     }
 }
