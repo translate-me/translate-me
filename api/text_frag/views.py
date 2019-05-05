@@ -17,14 +17,20 @@ class TextFragView(APIView):
         text_lenght = len(text_content)
 
         for i in range(len(breakpoints)-1):
-            text_aux = text_content
-            text_aux = text_content[breakpoints[i]:breakpoints[i+1]]
+            fragment_content = text_content[breakpoints[i]:breakpoints[i+1]]
+            self.create_fragment(fragment_content)
 
-        text_aux = text_content[breakpoints[-1]:text_lenght]
+        last_fragment_content = text_content[breakpoints[-1]:text_lenght]
+        self.create_fragment(last_fragment_content)
 
-        return Response(text_content, status=status.HTTP_201_CREATED)
+        return Response("Fragmentos criados", status=status.HTTP_201_CREATED)
+    
+    def create_fragment(self, fragment_content):
+        fragment = TextFrag.objects.create(
+            content = fragment_content,
+            value = len(fragment_content)*0.1,
+        ) 
         
-
 # {
 #     "text_content": "hello, world",
 #     "breakpoints": [0, 6, 9]
