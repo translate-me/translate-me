@@ -14,16 +14,18 @@ class TextFragView(APIView):
     def post(self, request):
         text_content = self.request.data['text_content']
         breakpoints = self.request.data['breakpoints']
-        text_lenght = len(text_content)
-
-        for i in range(len(breakpoints)-1):
-            fragment_content = text_content[breakpoints[i]:breakpoints[i+1]]
-            self.create_fragment(fragment_content)
-
-        last_fragment_content = text_content[breakpoints[-1]:text_lenght]
-        self.create_fragment(last_fragment_content)
+        self.fragment_text(text_content, breakpoints)
 
         return Response("Fragmentos criados", status=status.HTTP_201_CREATED)
+
+    def fragment_text(self, text_content, breakpoints):
+        break_point = 0
+        for i in breakpoints:
+            fragment_content = text_content[break_point:i]
+            break_point = i
+            self.create_fragment(fragment_content)
+        last_fragment_content = text_content[break_point:]
+        self.create_fragment(last_fragment_content)
     
     def create_fragment(self, fragment_content):
         fragment = TextFrag.objects.create(
@@ -32,7 +34,7 @@ class TextFragView(APIView):
         ) 
         
 # {
-#     "text_content": "hello, world",
-#     "breakpoints": [0, 6, 9]
+#     "text_content": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+#     "breakpoints": [50, 100, 150, 250, 400, 500]
 # }
 

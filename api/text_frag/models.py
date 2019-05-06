@@ -1,8 +1,8 @@
 from django.db import models
 
 CHOICES = (
-    ('1', 'To correct'),
-    ('2', 'Correcting'),
+    ('1', 'To translate'),
+    ('2', 'Translating'),
     ('3', 'To review'),
     ('4', 'Reviewing'),
     ('5', 'To finish'),
