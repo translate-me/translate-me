@@ -1,28 +1,29 @@
-<!-- Coloque um título objetivo das alterações feitas (geralmente, o nome da issue é suficiente) -->
+<!--- Provide a general summary of your changes in the Title above -->
 
-## Issue #<numero> <tipo da issue>
-<!-- Faça a ligação com a respectivia issue associada a esse pull request
- -->
-## Descrição
-<!-- Descreva em detalhes quais alterações foram feitas -->
+## Issue #
+<!-- Link the pull request's respective issue -->
 
-## Screenshots (se aplicável)
-<!-- Caso considere viável a apresentação visual das mudanças(uma nova funcionalidade em uma página, por exemplo) -->
-<!-- Caso não considere, apenas apague este tópico -->
+## Description
+<!--- Describe your changes in detail -->
 
-## Tipos de mudanças
+## Screenshots (if appropriate):
+<!--- You may want to show a new page functionality, for example -->
+<!--- If not appropriate, just delete this topic -->
 
-- [ ] Correção de bugs
-- [ ] Nova funcionalidade
-- [ ] Documentação
+## Types of changes
+<!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation
 
-## Checklist
+## Checklist:
+<!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
+<!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
+- [ ] My code follows the code style of this project.
+- [ ] My change requires a change to the documentation.
+- [ ] I have updated the documentation accordingly.
 
-- [ ] Meu código segue a folha de estilo do projeto
-- [ ] Realizei os testes necessários
-- [ ] Minhas alterações requerem mudanças na documentação
-- [ ] Eu atualizei a documentação de acordo
+<!--- Do you wanna make your experience funnier? Try make your pull request with a selfie!! :) -->
 
-<!-- Quer tornar sua experiência mais divertida? Tente fazer um pull request com uma selfie!! ^^ -->
-
-<!--- Um pluglin chrome para selfies pode ser encontrado em https://github.com/thieman/github-selfies -->
+<!--- You can check the selfie plugin in https://github.com/thieman/github-selfies -->  
