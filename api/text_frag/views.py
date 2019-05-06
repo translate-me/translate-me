@@ -12,6 +12,10 @@ class TextFragView(APIView):
         return Response('ok')
 
     def post(self, request):
+        '''
+        Receives a JSON and processes its content
+        '''
+        
         text_content = self.request.data['text_content']
         breakpoints = self.request.data['breakpoints']
         self.fragment_text(text_content, breakpoints)
@@ -19,6 +23,10 @@ class TextFragView(APIView):
         return Response("Fragmentos criados", status=status.HTTP_201_CREATED)
 
     def fragment_text(self, text_content, breakpoints):
+        '''
+        Receives a text and splits it into fragments, according to breakpoints
+        '''
+
         break_point = 0
         for i in breakpoints:
             fragment_content = text_content[break_point:i]
@@ -28,6 +36,10 @@ class TextFragView(APIView):
         self.create_fragment(last_fragment_content)
     
     def create_fragment(self, fragment_content):
+        '''
+        Receives a fragment and saves it in database
+        '''
+
         fragment = TextFrag.objects.create(
             content = fragment_content,
             value = len(fragment_content)*0.1,
