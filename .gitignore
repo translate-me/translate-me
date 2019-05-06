@@ -1,0 +1,7 @@
+#python files
+*.log
+*.pot
+*.pyc
+*.pye
+__pycache__
+
