@@ -4,4 +4,8 @@ from text.models import Text
 class TextSerializer(serializers.ModelSerializer):
     class Meta:
         model = Text
-        fields = '__all__'
+        fields = [
+            'context',
+            'author',
+            'language'
+        ]
