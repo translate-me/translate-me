@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from text.models.fragment_model import Fragment
-from text.models.text_model import Text
-from text.serializers.text_serializer import TextSerializer
+from fragment.models import Fragment
+from text.models import Text
+from text.serializers import TextSerializer
 
 # Create your views here.
 

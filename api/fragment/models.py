@@ -1,5 +1,5 @@
 from django.db import models
-from text.models.text_model import Text
+from text.models import Text
 
 CHOICES = (
     ('1', 'To translate'),
@@ -10,8 +10,7 @@ CHOICES = (
     ('6', 'Finished')
 )
 
-# Create your models here.
-class Fragment (models.Model):
+class Fragment(models.Model):
     id_text = models.ForeignKey(Text, on_delete=models.CASCADE)
     content = models.TextField()
     value = models.FloatField(default=0)
