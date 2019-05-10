@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from text.models import Text
+from text.models.text import Text
 
 class TextSerializer(serializers.ModelSerializer):
     class Meta:

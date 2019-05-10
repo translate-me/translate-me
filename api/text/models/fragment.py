@@ -1,4 +1,5 @@
 from django.db import models
+from text.models.text import Text
 
 CHOICES = (
     ('1', 'To translate'),
@@ -10,8 +11,8 @@ CHOICES = (
 )
 
 # Create your models here.
-class TextFrag (models.Model):
-    content = models.CharField(max_length=20000)
+class Fragment (models.Model):
+    content = models.TextField()
     value = models.FloatField(default=0)
     state = models.CharField(max_length=12, choices=CHOICES, default='1')
     total_reviews = models.IntegerField(default=0)
