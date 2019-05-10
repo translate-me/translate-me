@@ -5,9 +5,9 @@ from fragment.serializers import FragmentSerializer
 from rest_framework.views import APIView
 
 
-class GetFragmentsByLanguage(APIView):
+class GetFragmentsByTranslator(APIView):
 
-    def get(self, request, id_language):        
-        fragments = Fragment.objects.filter(text__language = id_language)
+    def get(self, request, id_translator):        
+        fragments = Fragment.objects.filter(translator = id_translator)
         serializer = FragmentSerializer(fragments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

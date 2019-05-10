@@ -12,5 +12,6 @@ class FragmentSerializer(serializers.ModelSerializer):
             'id',
             'content',
             'value',
-            'text'
+            'text',
+            'translator'
         ]
