@@ -1,6 +1,6 @@
 from django.urls import path
-from fragment.views import FragmentView
+from fragment.views.get_fragments_by_language import GetFragmentsByLanguage
 
 urlpatterns = [
-    path('', FragmentView.as_view()),
+    path('fragments_by_language/<int:language_id>/', GetFragmentsByLanguage.as_view()),
 ]

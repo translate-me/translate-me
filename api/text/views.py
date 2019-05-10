@@ -25,7 +25,7 @@ class TextView(APIView):
 
     def fragment_text(self, text_content, breakpoints, id_text):
         '''
-        Receives a text and splits it into fragments, according to breakpoints
+        Receives a id_text and splits it into fragments, according to breakpoints
         '''
 
         text = Text.objects.get(id = id_text)
@@ -46,7 +46,7 @@ class TextView(APIView):
         fragment = Fragment.objects.create(
             content = fragment_content,
             value = len(fragment_content)*0.1,
-            id_text = text
+            text = text
         )
 
 

@@ -11,7 +11,7 @@ CHOICES = (
 )
 
 class Fragment(models.Model):
-    id_text = models.ForeignKey(Text, on_delete=models.CASCADE)
+    text = models.ForeignKey(Text, on_delete=models.CASCADE)
     content = models.TextField()
     value = models.FloatField(default=0)
     state = models.CharField(max_length=12, choices=CHOICES, default='1')
