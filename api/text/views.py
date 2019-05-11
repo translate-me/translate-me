@@ -9,7 +9,14 @@ from text.serializers import TextSerializer
 
 class TextView(APIView):
     def get(self, request):
-        return Response('ok')
+        try:
+            data = request.data
+            author = data['author']
+            texts = Text.objects.filter(author=author)
+            serializer = TextSerializer(texts, many=True)
+            return Response(serializer.data)
+        except:
+            return Response('Send me a JSON', status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         data = request.data
