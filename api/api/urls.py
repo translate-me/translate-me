@@ -21,5 +21,6 @@ urlpatterns = [
     # path('text_frag/', include('text_frag.urls')),
     path('text/', include('text.urls')),
     path('fragment/', include('fragment.urls')),
+    path('category/', include('category.urls'))
 
 ]

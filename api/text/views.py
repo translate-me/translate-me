@@ -26,9 +26,9 @@ class TextView(APIView):
         if serializer.is_valid():
             serializer.save()
             self.fragment_text(text_content, breakpoints, serializer.data['id'])
-            return Response('Texto inserido com sucesso', status=status.HTTP_201_CREATED)
+            return Response('Text successfully inserted', status=status.HTTP_201_CREATED)
         else:
-            return Response('Dados inválidos', status=status.HTTP_400_BAD_REQUEST)
+            return Response('Invalid data', status=status.HTTP_400_BAD_REQUEST)
 
     def fragment_text(self, text_content, breakpoints, id_text):
         '''
@@ -45,7 +45,7 @@ class TextView(APIView):
         self.create_fragment(last_fragment_content, text)
         text.total_fragments = len(breakpoints) + 1
         text.save()
-        
+
     def create_fragment(self, fragment_content, text):
         '''
         Receives a fragment and saves it in database
@@ -62,5 +62,6 @@ class TextView(APIView):
 #     "context": "Hello World",
 #     "author": 1,
 #     "language": 1,
+#     "category
 #     "breakpoints": [50, 100, 150, 250, 400, 500]
 # }

@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'text',
     'fragment',
-    'corsheaders'
+    'corsheaders',
+    'category'
 ]
 
 MIDDLEWARE = [
