@@ -8,5 +8,7 @@ class TextSerializer(serializers.ModelSerializer):
             'id',
             'context',
             'author',
-            'language'
+            'language',
+            'category'
+
         ]

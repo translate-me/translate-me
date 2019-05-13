@@ -10,5 +10,5 @@ urlpatterns = [
     path('fragments_by_translator/<int:id_translator>/', GetFragmentsByTranslator.as_view()),
     path('fragments_by_id_text/<int:id_text>/', GetFragmentsByTextId.as_view()),
     path('all_fragments/', GetAllFragments.as_view()),
-    path('fragments_by_category/<int:id_category>/', GetFragmentsByCategory.as_view()),
+    path('fragments_by_category/<str:categories>/', GetFragmentsByCategory.as_view()),
 ]

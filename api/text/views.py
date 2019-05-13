@@ -28,6 +28,7 @@ class TextView(APIView):
             self.fragment_text(text_content, breakpoints, serializer.data['id'])
             return Response('Text successfully inserted', status=status.HTTP_201_CREATED)
         else:
+            print(serializer.errors)
             return Response('Invalid data', status=status.HTTP_400_BAD_REQUEST)
 
     def fragment_text(self, text_content, breakpoints, id_text):
@@ -62,6 +63,6 @@ class TextView(APIView):
 #     "context": "Hello World",
 #     "author": 1,
 #     "language": 1,
-#     "category
+#     "category": [1],
 #     "breakpoints": [50, 100, 150, 250, 400, 500]
 # }

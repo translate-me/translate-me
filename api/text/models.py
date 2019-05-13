@@ -1,4 +1,5 @@
 from django.db import models
+from category.models import Category
 
 # Create your models here.
 
@@ -8,4 +9,4 @@ class Text (models.Model):
     finished_fragments = models.IntegerField(default=0)
     author = models.IntegerField() #id_autor
     language = models.IntegerField() #id_language
-
+    category = models.ManyToManyField(Category)
