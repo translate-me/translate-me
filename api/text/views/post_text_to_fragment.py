@@ -7,7 +7,7 @@ from text.serializers.text_serializer import TextSerializer
 
 # Create your views here.
 
-class TextView(APIView):
+class PostTextToFragment(APIView):
     def get(self, request):
         return Response('ok')
 
@@ -38,7 +38,7 @@ class TextView(APIView):
         self.create_fragment(last_fragment_content, text)
         text.total_fragments = len(breakpoints) + 1
         text.save()
-        
+
     def create_fragment(self, fragment_content, text):
         '''
         Receives a fragment and saves it in database
