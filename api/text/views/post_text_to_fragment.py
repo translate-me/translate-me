@@ -46,7 +46,7 @@ class PostTextToFragment(APIView):
         fragment = Fragment.objects.create(
             content = fragment_content,
             value = len(fragment_content)*0.1,
-            id_text = text
+            text = text
         )
 
 

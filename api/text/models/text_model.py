@@ -8,4 +8,3 @@ class Text (models.Model):
     finished_fragments = models.IntegerField(default=0)
     author = models.IntegerField() #id_autor
     language = models.IntegerField() #id_language
-
