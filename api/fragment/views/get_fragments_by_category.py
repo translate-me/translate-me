@@ -1,5 +1,5 @@
 from fragment.models import Fragment
-from fragment.serializers import FragmentSerializer
+from fragment.serializers.fragment_serializer import FragmentSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status

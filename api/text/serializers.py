@@ -9,6 +9,6 @@ class TextSerializer(serializers.ModelSerializer):
             'context',
             'author',
             'language',
-            'category'
+            'category',
 
         ]
