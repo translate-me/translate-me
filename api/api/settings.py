@@ -16,6 +16,7 @@ import socket
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+DJANGO_DRF_FILEPOND_UPLOAD_TMP = os.path.join(BASE_DIR, 'filepond-temp-uploads')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'text',
     'corsheaders',
+    'django_drf_filepond',
     'comment'
 ]
 
@@ -57,10 +59,10 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ORIGIN_WHITELIST = [
-]
+# CORS_ORIGIN_WHITELIST = [
+# ]
 
 ROOT_URLCONF = 'api.urls'
 
