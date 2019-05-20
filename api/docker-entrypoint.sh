@@ -1,6 +1,6 @@
 #!/user/bin/env ash
 
-POSTGRES_PORT="5432"
+POSTGRES_PORT="5435"
 
 wait_ready() {
 echo "Aguardando o $1 na porta $2"
@@ -10,4 +10,6 @@ done
 }
 
 wait_ready db $POSTGRES_PORT
+exec python3 manage.py makemigrations &
+exec python3 manage.py migrate &
 exec python3 manage.py runserver 0.0.0.0:9000

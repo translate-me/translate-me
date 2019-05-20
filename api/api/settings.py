@@ -92,7 +92,7 @@ DATABASES = {
         'USER': 'admin',
         'PASSWORD': 'translate-me-pass',
         'HOST': 'translate_db',
-        'PORT': 5432,
+        'PORT': 5435,
     }
 }
 
