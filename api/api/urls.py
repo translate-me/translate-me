@@ -18,5 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # path('text_frag/', include('text_frag.urls')),
     path('text/', include('text.urls')),
+    path('comment/', include('comment.urls'))
 ]

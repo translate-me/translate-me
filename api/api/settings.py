@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '0.0.0.0',
+    'localhost'
 ]
 
 # Application definition
@@ -41,8 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'text',
-    'corsheaders'
-
+    'corsheaders',
+    'comment'
 ]
 
 MIDDLEWARE = [
