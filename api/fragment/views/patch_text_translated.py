@@ -3,12 +3,16 @@ from rest_framework import status
 from fragment.models import Fragment
 from fragment.serializers.translated_serializer import TranslatedSerializer
 from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
 
 class PatchTextTranslated(APIView):
 
     def get(self, request, id_fragment):
         return Response('Page loaded', status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=TranslatedSerializer,
+                         responses={200: "Ok"},
+                         operation_description="Edit translated text")
     def patch(self, request, id_fragment):
         data = request.data
         serializer = TranslatedSerializer(data=data)
