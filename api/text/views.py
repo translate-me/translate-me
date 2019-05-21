@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from text.models import Text
-from text.serializers import TextSerializer
+from text.models import Text, Fragment
+from text.serializers import TextSerializer, FragmentSerializer
 
 # Create your views here.
 
@@ -19,6 +19,17 @@ class TextView(APIView):
             return Response('Texto inserido com sucesso', status=status.HTTP_201_CREATED)
         else:
             return Response('Dados inválidos', status=status.HTTP_400_BAD_REQUEST)
+
+class FragmentView(APIView):
+     def patch(self, request, pk):
+        print(pk)
+        fragment = Fragment.objects.get(id=pk)
+        serializer = FragmentSerializer(fragment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response('Fragmento atribuído a tradutor com sucesso', status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 # {
