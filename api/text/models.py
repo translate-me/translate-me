@@ -25,6 +25,7 @@ class Fragment (models.Model):
     state = models.CharField(max_length=12, choices=CHOICES, default='1')
     total_reviews = models.IntegerField(default=0)
     id_author = models.IntegerField(null=True)
+    id_translator = models.IntegerField(null=True)
     # idTexto aqui
 
 

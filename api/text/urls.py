@@ -1,6 +1,8 @@
-from django.urls import path
-from text.views import TextView
+from django.urls import path, re_path
+from text.views import TextView, FragmentView
 
 urlpatterns = [
-    path('', TextView.as_view()),
+    path('text/', TextView.as_view()),
+    re_path(r'fragment/(?P<pk>\d+)/$', FragmentView.as_view()),
+
 ]
