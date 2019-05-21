@@ -4,10 +4,16 @@ from rest_framework import status
 from fragment.models import Fragment
 from text.models import Text
 from text.serializers import TextSerializer
+from drf_yasg.utils import swagger_auto_schema
+
+
 
 # Create your views here.
 
 class TextView(APIView):
+
+    @swagger_auto_schema(responses={200: "Ok"},
+                         operation_description="Add new text")
     def get(self, request):
         try:
             data = request.data
@@ -18,6 +24,9 @@ class TextView(APIView):
         except:
             return Response('Send me a JSON', status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(request_body=TextSerializer,
+                         responses={200: "Ok"},
+                         operation_description="Add new text")
     def post(self, request):
         data = request.data
         text_content = data['text_content']
@@ -31,6 +40,9 @@ class TextView(APIView):
             print(serializer.errors)
             return Response('Invalid data', status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(request_body=TextSerializer,
+                         responses={200: "Ok"},
+                         operation_description="Fragment text")
     def fragment_text(self, text_content, breakpoints, id_text):
         '''
         Receives a id_text and splits it into fragments, according to breakpoints
@@ -47,6 +59,9 @@ class TextView(APIView):
         text.total_fragments = len(breakpoints) + 1
         text.save()
 
+    @swagger_auto_schema(request_body=TextSerializer,
+                         responses={200: "Ok"},
+                         operation_description="Add new fragment")
     def create_fragment(self, fragment_content, text):
         '''
         Receives a fragment and saves it in database

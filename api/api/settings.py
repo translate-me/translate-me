@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'text',
     'fragment',
     'corsheaders',
-    'category'
+    'category',
+    'drf_yasg',
+    
 ]
 
 MIDDLEWARE = [
