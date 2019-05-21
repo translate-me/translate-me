@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'category',
     'drf_yasg',
+    'comment'
     
 ]
 
