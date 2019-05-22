@@ -1,4 +1,5 @@
-# authentication
+# Translate.me
+<a href="https://codeclimate.com/github/translate-me/translate-me/maintainability"><img src="https://api.codeclimate.com/v1/badges/de0b505ff8f9cf56cdff/maintainability" /></a>
 
 ## Run project
 1. To run authenticantion at first you need verrify if you have docker and docker-compose in your machine.
