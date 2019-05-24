@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from text.models import Text, Fragment
 from text.serializers import TextSerializer, FragmentSerializer
+from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
 
@@ -21,6 +22,9 @@ class TextView(APIView):
             return Response('Dados inválidos', status=status.HTTP_400_BAD_REQUEST)
 
 class FragmentView(APIView):
+    @swagger_auto_schema(request_body=FragmentSerializer,
+                         responses={200: "Ok"},
+                         operation_description="Translator receives the fragment")
      def patch(self, request, pk):
         print(pk)
         fragment = Fragment.objects.get(id=pk)
