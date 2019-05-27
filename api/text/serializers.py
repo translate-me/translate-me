@@ -5,7 +5,10 @@ class TextSerializer(serializers.ModelSerializer):
     class Meta:
         model = Text
         fields = [
+            'id',
             'context',
             'author',
-            'language'
+            'language',
+            'category'
+
         ]
