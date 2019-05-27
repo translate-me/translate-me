@@ -21,6 +21,9 @@ class TextComponent(models.Model):
     
     def get_type(self) -> str:
         pass
+    
+    def get_value(self) -> float:
+        pass
 
     def get_fragments(self) -> []:
         pass
@@ -44,8 +47,14 @@ class TextComposite (TextComponent):
     def get_fragments(self) -> str:
         self.children.sort(key=lambda x: x.position) 
         return self.children
+
+    def get_value(self) -> float:
+        value = 0
+        for i in self.children:
+            value += i.get_value()
+        return value
     
-    def save_db(self) -> None:
+    def save_fragments(self) -> None:
         position = 1
         for i in self.children:
             i.position = position
@@ -64,13 +73,20 @@ class TextFragment(TextComponent):
 
     def get_type(self) -> str:
         return 'text'
+    
+    def get_value(self) -> float:
+        return self.value
 
 
 class ImageFragment(TextComponent):
     position = models.IntegerField(blank=True, null=True)
     text = models.ForeignKey(TextComposite, on_delete=models.CASCADE)
+    value = models.FloatField(default=0)
     image = models.TextField()
 
     def get_type(self) -> str:
         return 'image'
+    
+    def get_value(self) -> float:
+        return self.value
 

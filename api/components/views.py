@@ -28,13 +28,17 @@ text_request = {
         {
             'content': 'minha querida imagem',
             'type': 'image'
-        }
+        },
+        {
+            'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet tellus cras adipiscing enim eu turpis egestas. Elementum nibh tellus molestie nunc. Ultrices eros in cursus turpis massa tincidunt dui ut. Cursus turpis massa tincidunt dui. Risus viverra adipiscing at in tellus integer feugiat scelerisque. At ultrices mi tempus imperdiet nulla. Aenean et tortor at risus. Urna neque viverra justo nec ultrices dui sapien eget. Imperdiet dui accumsan sit amet nulla. Felis eget nunc lobortis mattis aliquam faucibus purus in massa. Viverra suspendisse potenti nullam ac tortor vitae purus. Felis imperdiet proin fermentum leo vel orci porta. Fames ac turpis egestas integer eget aliquet nibh praesent. Pulvinar pellentesque habitant morbi tristique senectus et netus et malesuada.',
+            'type': 'text'
+        },
     ]
 }
 
 class GetAllFragments(APIView):
     def get(self, request):
-        text_composite = TextComposite.objects.get(id=20)
+        text_composite = TextComposite.objects.get(id=49)
         text_composite.init()
 
         text_fragments = TextFragment.objects.filter(text=text_composite)
@@ -46,6 +50,11 @@ class GetAllFragments(APIView):
             text_composite.add(i)
 
         response = self.get_response(text_composite.get_fragments())
+        text_value = {
+            'text_value': text_composite.get_value()
+        }
+        response.insert(0, text_value)
+
         return Response(response)
 
     def post(self, request):        
@@ -57,7 +66,9 @@ class GetAllFragments(APIView):
 
         self.create_fragments(text_request['content'], text_composite)
 
-        text_composite.save_db()
+        text_composite.save_fragments()
+        text_composite.total_fragments = len(text_composite.get_fragments())
+        text_composite.save()
         
         return Response('Fragmentos criados com sucesso')
 
