@@ -3,10 +3,10 @@ from text.models import (
     Text,
     Category,
     Fragment,
-    Have
+    Review
 )
 
 admin.site.register(Text)
 admin.site.register(Fragment)
 admin.site.register(Category)
-admin.site.register(Have)
+admin.site.register(Review)

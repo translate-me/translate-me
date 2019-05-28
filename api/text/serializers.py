@@ -2,8 +2,8 @@ from rest_framework import serializers
 from text.models import (
     Category,
     Text,
-    Have,
     Fragment,
+    Review
 )
 
 """ Category."""
@@ -38,7 +38,8 @@ class TextSerializerAddAndUpdate(serializers.ModelSerializer):
             'fragments_doing',
             'context',
             'author',
-            'language'
+            'language',
+            'categories'
         ]
 
 
@@ -46,24 +47,6 @@ class TextSerializerList(serializers.ModelSerializer):
     class Meta:
         model = Text
         fields = '__all__'
-
-
-""" Have."""
-
-
-class HaveSerializerAddAndUpdate(serializers.ModelSerializer):
-    class Meta:
-        model = Have
-        fields = [
-            'category_id',
-            'text_id'
-        ]
-
-
-class HaveSerializerList(serializers.ModelSerializer):
-    class Meta:
-        model = Have
-        fields = "__all__"
 
 
 """ Fragment."""
@@ -84,5 +67,25 @@ class FragmentSerializerAddAndUpdate(serializers.ModelSerializer):
 
 class FragmentSerializerList(serializers.ModelSerializer):
     class Meta:
-        models = Fragment
+        model = Fragment
+        fields = "__all__"
+
+
+""" Review."""
+
+
+class ReviewSerializerAddAndUpdate(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = [
+            'fragment_id',
+            'review_username',
+            'comment',
+            'approve'
+        ]
+
+
+class ReviewSerializerList(serializers.ModelSerializer):
+    class Meta:
+        model = Review
         fields = "__all__"

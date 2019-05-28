@@ -13,8 +13,8 @@ CHOICES = (
 
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
-    category_name = models.CharField(max_legth=100, null=False, blank=False)
-    category_description = models.CharField(max_legth=200, null=False,
+    category_name = models.CharField(max_length=100, null=False, blank=False)
+    category_description = models.CharField(max_length=200, null=False,
                                             blank=False)
 
 
@@ -27,16 +27,7 @@ class Text(models.Model):
     context = models.CharField(max_length=200, null=False, blank=False)
     author = models.CharField(max_length=50, null=False, blank=False)
     language = models.IntegerField(null=False, blank=False)
-
-
-class Have(models.Model):
-    class Meta:
-        unique_together = ('category_id', 'text_id')
-
-    category_id = models.ForeignKey(Category, on_delete=models.SET_NULL,
-                                    null=False, blank=False)
-    text_id = models.ForeignKey(Text, on_delete=models.SET_NULL,
-                                null=False, blank=False)
+    categories = models.ManyToManyField(Category)
 
 
 """ Fragment."""
@@ -44,10 +35,10 @@ class Have(models.Model):
 
 class Fragment(models.Model):
     text_id = models.ForeignKey(Text, on_delete=models.SET_NULL,
-                                null=False, blank=False)
+                                null=True)
     body = models.TextField(null=False, blank=False)
     price = models.FloatField(default=0)
-    state = models.CharField(max_legth=12, choices=CHOICES,
+    state = models.CharField(max_length=12, choices=CHOICES,
                              default='To translate', null=False, blank=False)
     review_username = models.CharField(max_length=50, null=True, blank=True)
     total_reviews = models.IntegerField(default=0)
@@ -58,6 +49,7 @@ class Fragment(models.Model):
 
 class Review(models.Model):
     fragment_id = models.ForeignKey(Fragment, on_delete=models.SET_NULL,
-                                    null=False, blank=False)
+                                    null=True)
     review_username = models.CharField(max_length=50, null=False, blank=False)
     comment = models.TextField()
+    approve = models.BooleanField(default=False)
