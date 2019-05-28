@@ -1,7 +1,12 @@
 from django.contrib import admin
-from text.models.text_model import Text
-from text.models.fragment_model import Fragment
+from text.models import (
+    Text,
+    Category,
+    Fragment,
+    Have
+)
 
-# Register your models here.
 admin.site.register(Text)
 admin.site.register(Fragment)
+admin.site.register(Category)
+admin.site.register(Have)
