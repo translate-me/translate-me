@@ -31,13 +31,13 @@ class TextSerializerAddAndUpdate(serializers.ModelSerializer):
     class Meta:
         model = Text
         fields = [
+            'id',
             'body',
             'total_fragments',
             'fragments_done',
             'fragments_revision',
             'fragments_doing',
             'context',
-            'author',
             'language',
             'categories'
         ]
