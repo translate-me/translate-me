@@ -1,8 +1,7 @@
-# import socket
-# import requests as rq
-# from rest_framework.response import Response
-# from django.http import JsonResponse
+from text.permissions import ServiceAuthenticationDjango
+from text.utils import FragmentIterator
 from rest_framework import generics
+from django.http import JsonResponse
 from rest_framework.permissions import (
     IsAdminUser,
 )
@@ -33,21 +32,21 @@ from text.serializers import (
 
 # Create class
 class AddNewCategory(generics.CreateAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Category.objects.all()
     serializer_class = CategorySerializerAddAndUpdate
 
 
 # List class
 class ListCategories(generics.ListAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Category.objects.all()
     serializer_class = CategorySerializerList
 
 
 # Update, detail, patch and destroy class
 class UpdateDestroyListCategory(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Category.objects.all()
     serializer_class = CategorySerializerList
 
@@ -57,21 +56,33 @@ class UpdateDestroyListCategory(generics.RetrieveUpdateDestroyAPIView):
 
 # Create class
 class AddNewText(generics.CreateAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Text.objects.all()
     serializer_class = TextSerializerAddAndUpdate
+
+    def perform_create(self, serializer):
+        data = self.request.data
+        body = data['body']
+        breakpoints = data['breakpoints']
+        try:
+            _ = [done for done in FragmentIterator(body, breakpoints, data.id)]
+            message = "Texto salvo e fragmentado"
+            serializer.save()
+            return JsonResponse({'status': True, 'message': message})
+        except Exception as erro:
+            return JsonResponse({'status': False, 'message': erro})
 
 
 # List class
 class ListTexts(generics.ListAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Text.objects.all()
     serializer_class = TextSerializerList
 
 
 # Update, detail, patch and destroy class
 class UpdateDestroyListText(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Text.objects.all()
     serializer_class = TextSerializerList
 
@@ -81,21 +92,21 @@ class UpdateDestroyListText(generics.RetrieveUpdateDestroyAPIView):
 
 # Create class
 class AddNewFragment(generics.CreateAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Fragment.objects.all()
     serializer_class = FragmentSerializerAddAndUpdate
 
 
 # List class
 class ListFragments(generics.ListAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Fragment.objects.all()
     serializer_class = FragmentSerializerList
 
 
 # Update, detail, patch and destroy class
 class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Fragment.objects.all()
     serializer_class = FragmentSerializerList
 
@@ -105,20 +116,20 @@ class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
 
 # Create class
 class AddNewReview(generics.CreateAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerAddAndUpdate
 
 
 # List class
 class ListReviews(generics.ListAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerList
 
 
 # Update, detail, patch and destroy class
 class UpdateDestroyListReview(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerList

@@ -40,7 +40,6 @@ class Fragment(models.Model):
     price = models.FloatField(default=0)
     state = models.CharField(max_length=12, choices=CHOICES,
                              default='To translate', null=False, blank=False)
-    review_username = models.CharField(max_length=50, null=True, blank=True)
     total_reviews = models.IntegerField(default=0)
 
 
