@@ -25,7 +25,7 @@ class FragmentView(APIView):
     @swagger_auto_schema(request_body=FragmentSerializer,
                          responses={200: "Ok"},
                          operation_description="Translator receives the fragment")
-     def patch(self, request, pk):
+    def patch(self, request, pk):
         print(pk)
         fragment = Fragment.objects.get(id=pk)
         serializer = FragmentSerializer(fragment, data=request.data, partial=True)

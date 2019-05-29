@@ -1,12 +1,12 @@
 version: '3'
 
-networks:
-  default:
-    external:
-      name:  profile_profile_net 
+# networks:
+#   default:
+#     external:
+#       name:  profile_profile_net 
 
 services:
-  db: 
+  db:
     image: postgres
     container_name: translate_db
     command: -p 5435

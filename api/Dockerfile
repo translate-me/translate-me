@@ -9,5 +9,5 @@ RUN apk add --no-cache --virtual .build-deps \
     libffi-dev jpeg-dev zlib-dev
 
 COPY requirements.txt /api/
-RUN pip install -r requirements.txt
+RUN pip install --trusted-host pypi.python.org autopep8 -r requirements.txt
 COPY . /api/
