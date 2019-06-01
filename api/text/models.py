@@ -28,7 +28,7 @@ class Text(models.Model):
     author = models.CharField(max_length=50, null=False, blank=False)
     language = models.IntegerField(null=False, blank=False)
     categories = models.ManyToManyField(Category)
-    text_translate = models.TextField()
+    text_translate = models.TextField(null=True, blank=True)
 
 
 """ Fragment."""
@@ -42,7 +42,7 @@ class Fragment(models.Model):
     state = models.CharField(max_length=12, choices=CHOICES,
                              default='To translate', null=False, blank=False)
     total_reviews = models.IntegerField(default=0)
-    fragment_translate = models.TextField()
+    fragment_translate = models.TextField(null=True, blank=True)
 
 
 """ Review."""
