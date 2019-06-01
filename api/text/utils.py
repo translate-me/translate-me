@@ -32,7 +32,7 @@ class FragmentIterator:
             create_fragment(self.identifier, fragment_body, price)
             raise StopIteration
 
-        end = self.breakpoints[self.count]
+        end = int(self.breakpoints[self.count])
         fragment_body = self.body[self.breakpoint:end]
         self.breakpoint = end
         price = len(fragment_body) * 0.1
