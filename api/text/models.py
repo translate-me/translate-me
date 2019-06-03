@@ -20,20 +20,8 @@ class Category(models.Model):
 
 
 class TextComponent(models.Model):
-
-    def init(self) -> None:
-        pass
-
-    def add(self, text_compoment) -> None:
-        pass
-    
-    def get_type(self) -> str:
-        pass
     
     def get_price(self) -> float:
-        pass
-
-    def get_fragments(self) -> []:
         pass
 
     class Meta:

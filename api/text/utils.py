@@ -9,8 +9,7 @@ def create_fragment(fragment, text):
         text_frag.body = body
         text_frag.price = len(body) * 0.1
         text_frag.text = text
-        return text_frag
-    return None
+        text.add(text_frag)
 
 
 class FragmentIterator:
@@ -27,7 +26,7 @@ class FragmentIterator:
     def __next__(self):
         if self.position < self.limit:
             fragment = self.fragments[self.position]
-            self.text.add(create_fragment(fragment, self.text))
+            create_fragment(fragment, self.text)
             self.position += 1
         else:
             print('position = ', self.position)
