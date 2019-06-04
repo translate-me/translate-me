@@ -9,7 +9,10 @@ from text.models import (
     Category,
     Text,
     Fragment,
-    Review
+    Review,
+    Notification,
+    Observer,
+    ConcreteObserverAuthor,
 )
 from text.serializers import (
     # Serializer category
@@ -24,6 +27,8 @@ from text.serializers import (
     # Serializer Review
     ReviewSerializerAddAndUpdate,
     ReviewSerializerList,
+    # Serializer Notification
+    NotificationSerializer,
 )
 
 
@@ -134,3 +139,23 @@ class UpdateDestroyListReview(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerList
+
+""" Notification."""
+
+#List Notification
+class ListNotification(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = FragmentSerializerList
+    queryset = Fragment.objects.all()
+
+    def perform_update(self, serializer):
+        interest_fragment = Fragment.objects.get(id=1)
+        interest_fragment.change_state('Translating')
+        serializer.save()
+    
+    # queryset = interest_fragment.observer_list
+    
+
+
+
+

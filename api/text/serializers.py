@@ -3,7 +3,8 @@ from text.models import (
     Category,
     Text,
     Fragment,
-    Review
+    Review,
+    Notification,
 )
 
 """ Category."""
@@ -89,3 +90,11 @@ class ReviewSerializerList(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = "__all__"
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = [
+            'Notification_type',
+        ]
