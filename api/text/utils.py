@@ -3,6 +3,10 @@ from text.models import TextFragment, Text
 
 
 def create_fragment(fragment, text):
+    """
+    Creates a fragment according to its type and adds the fragment
+    into text's list of fragments
+    """
     if fragment['type'] == 'text':
         body = fragment['body']
         text_frag = TextFragment()
@@ -13,7 +17,9 @@ def create_fragment(fragment, text):
 
 
 class FragmentIterator:
-    """ Iterate in text send."""
+    """
+    Iterates all fragments in text
+    """
     def __init__(self, fragments, text):
         self.limit = len(fragments)
         self.position = 0
@@ -23,10 +29,15 @@ class FragmentIterator:
     def __iter__(self):
         return self
 
+    """
+    Finishes when position = limit
+    Otherwise, gets the JSON at position in fragments array and
+    sends it to create fragment
+    """
     def __next__(self):
         if self.position < self.limit:
-            fragment = self.fragments[self.position]
-            create_fragment(fragment, self.text)
+            fragment_json = self.fragments[self.position]
+            create_fragment(fragment_json, self.text)
             self.position += 1
         else:
             print('position = ', self.position)
