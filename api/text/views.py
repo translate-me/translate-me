@@ -133,9 +133,14 @@ class AddNewReview(generics.CreateAPIView):
         instance = serializer.data
         fragment = TextFragment.objects.get(id=instance['fragment'])
         translator = fragment.fragment_translator
+        text_author = fragment.text.author
         print(instance['review_username'], translator)
+        # The translator and review is the same
         if instance['review_username'].lower() == translator.lower():
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_USER)
+        # The review and author is the same
+        if instance['review_username'].lower() == text_author.lower():
+            raise serializers.ValidationError(MESSAGES.ERRO_SAME_AUTHOR)
         serializer.save()
 
 
