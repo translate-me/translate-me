@@ -1,5 +1,5 @@
 """ Class to use methods that can't stay in views.py"""
-from text.models import TextFragment, Text
+from text.models import TextFragment
 
 
 def create_fragment(fragment, text):
@@ -7,6 +7,7 @@ def create_fragment(fragment, text):
     Creates a fragment according to its type and adds the fragment
     into text's list of fragments
     """
+    print(fragment)
     if fragment['type'] == 'text':
         body = fragment['body']
         text_frag = TextFragment()
@@ -35,6 +36,7 @@ class FragmentIterator:
     sends it to create fragment
     """
     def __next__(self):
+        print(self.fragments)
         if self.position < self.limit:
             fragment_json = self.fragments[self.position]
             create_fragment(fragment_json, self.text)
