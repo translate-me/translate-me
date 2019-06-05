@@ -78,7 +78,7 @@ class ReviewSerializerAddAndUpdate(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = [
-            'fragment_id',
+            'fragment',
             'review_username',
             'comment',
             'approve'

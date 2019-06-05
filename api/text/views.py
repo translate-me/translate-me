@@ -1,5 +1,7 @@
 from text.permissions import ServiceAuthenticationDjango
-from text.utils import FragmentIterator, create_fragment
+from rest_framework import serializers
+from text.utils import FragmentIterator
+from text.messages import Messages
 from rest_framework import generics
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -27,6 +29,7 @@ from text.serializers import (
     ReviewSerializerList,
 )
 
+MESSAGES = Messages()
 
 """ Category controller."""
 
@@ -54,6 +57,7 @@ class UpdateDestroyListCategory(generics.RetrieveUpdateDestroyAPIView):
 
 """ Text controller"""
 
+
 # Create class
 class AddNewText(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
@@ -70,10 +74,10 @@ class AddNewText(generics.CreateAPIView):
         try:
             _ = [done for done in FragmentIterator(fragments, text)]
         except Exception as erro:
-            return JsonResponse({'status': False, 'message': erro})
+            raise serializers.ValidationError(erro)
         text.save_fragments()
-        message = "Texto salvo e fragmentado"
-        return JsonResponse({'status': True, 'message': message})
+        return JsonResponse({'status': True,
+                             'message': MESSAGES.SUCESS_SAVE_TEXT})
 
 
 # List class
@@ -124,6 +128,15 @@ class AddNewReview(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerAddAndUpdate
+
+    def perform_create(self, serializer):
+        instance = serializer.data
+        fragment = TextFragment.objects.get(id=instance['fragment'])
+        translator = fragment.fragment_translator
+        print(instance['review_username'], translator)
+        if instance['review_username'].lower() == translator.lower():
+            raise serializers.ValidationError(MESSAGES.ERRO_SAME_USER)
+        serializer.save()
 
 
 # List class
