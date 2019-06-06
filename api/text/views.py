@@ -1,6 +1,9 @@
 from text.permissions import ServiceAuthenticationDjango
 from rest_framework import serializers
-from text.utils import FragmentIterator
+from text.utils import (
+    FragmentIterator,
+    percent_of_fragments,
+)
 from text.messages import Messages
 from rest_framework import generics
 from django.http import JsonResponse
@@ -24,6 +27,7 @@ from text.serializers import (
     # Serializer Fragment
     TextFragmentSerializerAddAndUpdate,
     TextFragmentSerializerList,
+    TextFragmentAddTranslatorSerializer,
     # Serializer Review
     ReviewSerializerAddAndUpdate,
     ReviewSerializerList,
@@ -120,6 +124,42 @@ class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TextFragmentSerializerList
 
 
+class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentAddTranslatorSerializer
+
+    def perform_update(self, serializer):
+        """
+        Verify fragment's percent can person allow to get.
+        """
+        data = self.request.data
+        if not percent_of_fragments(data['fragment_translator'],
+                                    data['text']):
+            raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
+        serializer.save()
+
+
+class FragmentToReview(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextFragmentSerializerList
+
+    def get_queryset(self):
+        """
+        Filter queryset to not get fragments with the same translator and
+        author to review.
+        """
+        username = self.kwargs['username']
+        texts = Text.objects.filter(author=username)
+        id_texts = [text.id for text in texts]
+        fragments = TextFragment.objects.exclude(
+            fragment_translator=username
+        ).exclude(
+            text__in=id_texts
+        )
+        return fragments
+
+
 """ Review."""
 
 
@@ -130,16 +170,18 @@ class AddNewReview(generics.CreateAPIView):
     serializer_class = ReviewSerializerAddAndUpdate
 
     def perform_create(self, serializer):
+        """
+        Verify if reviewer can get the fragment.
+        """
         instance = serializer.data
         fragment = TextFragment.objects.get(id=instance['fragment'])
         translator = fragment.fragment_translator
         text_author = fragment.text.author
-        print(instance['review_username'], translator)
         # The translator and review is the same
-        if instance['review_username'].lower() == translator.lower():
+        if instance['review_username'] == translator:
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_USER)
         # The review and author is the same
-        if instance['review_username'].lower() == text_author.lower():
+        if instance['review_username'] == text_author:
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_AUTHOR)
         serializer.save()
 
