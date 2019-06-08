@@ -24,6 +24,7 @@ from text.serializers import (
     # Serializer Fragment
     FragmentSerializerAddAndUpdate,
     FragmentSerializerList,
+    FragmentStateSerializer,
     # Serializer Review
     ReviewSerializerAddAndUpdate,
     ReviewSerializerList,
@@ -116,6 +117,16 @@ class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
     queryset = Fragment.objects.all()
     serializer_class = FragmentSerializerList
 
+class ChangeStateFragment(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Fragment.objects.all()
+    serializer_class = FragmentStateSerializer
+
+    def perform_update(self, serializer):
+        interest_fragment = Fragment.objects.get(id=1)
+        interest_fragment.change_state('Translating')
+        serializer.save()
+
 
 """ Review."""
 
@@ -143,15 +154,12 @@ class UpdateDestroyListReview(generics.RetrieveUpdateDestroyAPIView):
 """ Notification."""
 
 #List Notification
-class ListNotification(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    serializer_class = FragmentSerializerList
-    queryset = Fragment.objects.all()
+# class ListNotification(generics.RetrieveUpdateDestroyAPIView):
+#     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+#     serializer_class = FragmentSerializerList
+#     queryset = Fragment.objects.all()
 
-    def perform_update(self, serializer):
-        interest_fragment = Fragment.objects.get(id=1)
-        interest_fragment.change_state('Translating')
-        serializer.save()
+
     
     # queryset = interest_fragment.observer_list
     

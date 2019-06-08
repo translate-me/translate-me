@@ -92,6 +92,13 @@ class ReviewSerializerList(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class FragmentStateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fragment
+        fields = [
+            'state',
+        ]
+
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification

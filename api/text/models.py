@@ -45,53 +45,22 @@ class Fragment(models.Model):
                              default='To translate', null=False, blank=False)
     total_reviews = models.IntegerField(default=0)
     fragment_translate = models.TextField(null=True, blank=True)
-    
-    
-    observer_list = models.CharField(max_length=1000, null=True)
 
 
     def change_state(self, next_state):
+        self.notify_observers(next_state)
+        self.state = next_state
+
+
+    def notify_observers(self, next_state):
         oberserver_author = ConcreteObserverAuthor()
         oberserver_translator = ConcreteObserverTranslator()
         oberserver_revisor = ConcreteObserverRevisor()
-
-        
-
         list_observer = [oberserver_author, oberserver_revisor, oberserver_translator]
+        
         for i in list_observer:
-            if self.observer_list is None:
-                print("Socorro Jesus")
-                defined = json.dumps([i.observer_type])
-                self.observer_list = defined
-            else:
-                print("Socorro Jah")
-                defined = json.loads(self.observer_list)
-                defined.append(i.observer_type)
-                self.observer_list = json.dumps(defined)
             i.notify(self.pk, self.state, next_state)
 
-
-        
-
-
-
-    # observer_list = models.CharField(max_length=1000, null=True)
-
-    # def attach_observer(self, observer):
-    #     if self.observer_list == None:
-    #         instanced_list = [observer]
-    #     else:
-    #         instanced_list = json.loads(self.observer_list)
-    #         instanced_list.append(observer)
-    #     self.observer_list = json.dumps(instanced_list)
-
-    # def add_observers(self):
-    #     oberserver_author = ConcreteObserverAuthor()
-    #     oberserver_translator = ConcreteObserverTranslator()
-    #     oberserver_revisor = ConcreteObserverRevisor()
-    #     self.attach_observer(oberserver_author)
-    #     self.attach_observer(oberserver_translator)
-    #     self.attach_observer(oberserver_revisor)
 
 
 """ Review."""
@@ -123,37 +92,33 @@ class ConcreteObserverAuthor(Observer):
 
     observer_type = "Author"
 
-    def notify(self, ragment_id, previous_state, actual_state) -> Fragment:
-        if (previous_state == 'To translate' and actual_state == 'Translating'):
-            data = Fragment.objects.filter(id=2)
-        else: 
-            data = Fragment.objects.filter(id=3)  
-        return data
+    def notify(self, fragment_id, previous_state, actual_state) -> None:
+        print(self.observer_type)
+        print(fragment_id)
+        print(previous_state)
+        print(actual_state)
+        
 
 class ConcreteObserverTranslator(Observer):
     
     observer_type = "Translator"
 
-    def notify(self,  fragment_id, previous_state, actual_state) -> Fragment:
-        if (previous_state == 'To translate' and actual_state == 'Translating'):
-            data = Fragment.objects.filter(id=2)
-        else: 
-            data = Fragment.objects.filter(id=3)  
-        return data
+    def notify(self, fragment_id, previous_state, actual_state) -> None:
+        print(self.observer_type)
+        print(fragment_id)
+        print(previous_state)
+        print(actual_state)
 
 class ConcreteObserverRevisor(Observer):
     
     observer_type = "Revisor"
 
-    def notify(self,  fragment_id, previous_state, actual_state) -> Fragment:
-        if (previous_state == 'To translate' and actual_state == 'Translating'):
-            data = Fragment.objects.filter(id=2)
-        else: 
-            data = Fragment.objects.filter(id=3)  
-        return data
+    def notify(self,  fragment_id, previous_state, actual_state) -> None:
+        print(self.observer_type)
+        print(fragment_id)
+        print(previous_state)
+        print(actual_state)
 
-
-    
 
 class Notification(models.Model):
     text_id = models.ForeignKey(Text, on_delete=models.SET_NULL,
@@ -162,23 +127,3 @@ class Notification(models.Model):
     message = models.CharField(max_length=500, null=False, blank=False)
     is_seen = models.BooleanField(default=False)
 
-
-
-# fragment = Fragment.objects.filter(id=fragment_id)
-# text = Text.objects.filter(id=fragment.text_id)
-# data = None
-
-# class NotificationList(models.Model):
-#     text_id = models.ForeignKey(Text, on_delete=models.SET_NULL,
-#                                 null=True)
-#     new_notifications = models.CharField(max_lenght=1000)
-#     seen_notifications = models.CharField(max_lenght=1000)
-    
-#     def add_notification(self, notification_id):
-#         if self.new_notifications == None
-#             new_list = [notification_id]
-#             self.new_notifications = json.dumps(new_list)
-#         else 
-#             notifications_list = json.loads(self.new_notifications)
-#             notifications_list.append(notification_id)
-#             self.new_notifications = json.dumps(notifications_list)
