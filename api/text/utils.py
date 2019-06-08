@@ -1,46 +1,44 @@
 """ Class to use methods that can't stay in views.py"""
-from text.models import Fragment, Text
+from text.models import TextFragment, Text
 
 
-def create_fragment(identifier, body, price):
-    """ Commit on fragment table."""
-    text = Text.objects.get(id=identifier)
-    Fragment.objects.create(text_id=text,
-                            body=body,
-                            price=price)
+def create_fragment(fragment, text):
+    """
+    Creates a fragment according to its type and adds the fragment
+    into text's list of fragments
+    """
+    if fragment['type'] == 'text':
+        body = fragment['body']
+        text_frag = TextFragment()
+        text_frag.body = body
+        text_frag.price = len(body) * 0.1
+        text_frag.text = text
+        text.add(text_frag)
 
 
 class FragmentIterator:
-    """ Iterate in text send."""
-    def __init__(self, body, breakpoints, identifier):
-        self.limit = len(body) - 1
-        self.body = body
-        self.breakpoints = breakpoints
-        self.limit_2 = len(breakpoints) - 1
-        self.identifier = identifier
-        self.breakpoint = 0
-        self.count = 0
+    """
+    Iterates all fragments in text
+    """
+    def __init__(self, fragments, text):
+        self.limit = len(fragments)
+        self.position = 0
+        self.fragments = fragments
+        self.text = text
 
     def __iter__(self):
         return self
 
+    """
+    Finishes when position = limit
+    Otherwise, gets the JSON at position in fragments array and
+    sends it to create fragment
+    """
     def __next__(self):
-        # Boundary case
-        if self.count > self.limit_2:
-            fragment_body = self.body[self.breakpoint:]
-            price = len(fragment_body) * 0.1
-            create_fragment(self.identifier, fragment_body, price)
+        if self.position < self.limit:
+            fragment_json = self.fragments[self.position]
+            create_fragment(fragment_json, self.text)
+            self.position += 1
+        else:
+            print('position = ', self.position)
             raise StopIteration
-
-        end = int(self.breakpoints[self.count])
-        fragment_body = self.body[self.breakpoint:end]
-        self.breakpoint = end
-        price = len(fragment_body) * 0.1
-        # boundary cases
-        if self.breakpoint >= self.limit:
-            fragment_body = self.body[self.breakpoint:]
-            price = len(fragment_body) * 0.1
-            create_fragment(self.identifier, fragment_body, price)
-            raise StopIteration
-        self.count += 1
-        return create_fragment(self.identifier, fragment_body, price)

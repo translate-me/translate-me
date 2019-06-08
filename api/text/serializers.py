@@ -2,7 +2,7 @@ from rest_framework import serializers
 from text.models import (
     Category,
     Text,
-    Fragment,
+    TextFragment,
     Review,
     Notification,
 )
@@ -33,7 +33,7 @@ class TextSerializerAddAndUpdate(serializers.ModelSerializer):
         model = Text
         fields = [
             'id',
-            'body',
+            # 'body',
             'total_fragments',
             'fragments_done',
             'fragments_revision',
@@ -53,9 +53,9 @@ class TextSerializerList(serializers.ModelSerializer):
 """ Fragment."""
 
 
-class FragmentSerializerAddAndUpdate(serializers.ModelSerializer):
+class TextFragmentSerializerAddAndUpdate(serializers.ModelSerializer):
     class Meta:
-        model = Fragment
+        model = TextFragment
         fields = [
             'text_id',
             'body',
@@ -66,9 +66,9 @@ class FragmentSerializerAddAndUpdate(serializers.ModelSerializer):
         ]
 
 
-class FragmentSerializerList(serializers.ModelSerializer):
+class TextFragmentSerializerList(serializers.ModelSerializer):
     class Meta:
-        model = Fragment
+        model = TextFragment
         fields = "__all__"
 
 
@@ -94,7 +94,7 @@ class ReviewSerializerList(serializers.ModelSerializer):
 
 class FragmentStateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Fragment
+        model = TextFragment
         fields = [
             'state',
         ]

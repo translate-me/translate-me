@@ -6,7 +6,7 @@
 *.pot
 *.pyc
 __pycache__/
-**/__pycache__/
+api/*/__pycache__/
 api/*/migrations/0*
 local_settings.py
 db.sqlite3
