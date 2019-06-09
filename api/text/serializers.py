@@ -34,6 +34,7 @@ class TextSerializerAddAndUpdate(serializers.ModelSerializer):
         fields = [
             'id',
             # 'body',
+            'author',
             'total_fragments',
             'fragments_done',
             'fragments_revision',
@@ -94,16 +95,9 @@ class ReviewSerializerList(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class FragmentStateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TextFragment
-        fields = [
-            'state',
-        ]
+""" Notification."""
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = [
-            'Notification_type',
-        ]
+        fields = "__all__"

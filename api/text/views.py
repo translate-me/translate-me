@@ -13,6 +13,7 @@ from text.models import (
     Review,
     Observer,
     ConcreteObserverAuthor,
+    Notification,
 )
 from text.serializers import (
     # Serializer category
@@ -28,7 +29,7 @@ from text.serializers import (
     ReviewSerializerAddAndUpdate,
     ReviewSerializerList,
     # Serializer Notification
-    # NotificationSerializer,
+    NotificationSerializer,
 )
 
 
@@ -127,9 +128,6 @@ class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
         instanced_fragment.notify_observers(next_state)
         serializer.save()
 
-
-
-
 """ Review."""
 
 
@@ -138,6 +136,9 @@ class AddNewReview(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerAddAndUpdate
+
+
+
 
 
 # List class
@@ -155,12 +156,15 @@ class UpdateDestroyListReview(generics.RetrieveUpdateDestroyAPIView):
 
 """ Notification."""
 
-#List Notification
-# class ListNotification(generics.RetrieveUpdateDestroyAPIView):
-#     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-#     serializer_class = FragmentSerializerList
-#     queryset = Fragment.objects.all()
+# List Notification
+class ListNotification(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
 
-
-
-    # queryset = interest_fragment.observer_list
+# Update, detail, patch and destroy class
+class UpdateDestroyListNotification(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    
