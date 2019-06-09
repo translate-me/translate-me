@@ -1,5 +1,7 @@
 from django.db import models
-import json
+# from django.conf import settings
+# from django.db.models.signals import post_save
+# from django.dispatch import receiver
 from typing import List
 
 
@@ -42,7 +44,6 @@ class Text(TextComponent):
     categories = models.ManyToManyField(Category)
     text_translate = models.TextField(null=True, blank=True)
 
-
     def init(self) -> None:
         self.children: List[TextComponent] = []
 
@@ -72,15 +73,16 @@ class Text(TextComponent):
 
 class TextFragment(TextComponent):
     text = models.ForeignKey(Text, on_delete=models.SET_NULL,
-                                null=True)
+                             null=True)
     body = models.TextField(null=False, blank=False)
     price = models.FloatField(default=0)
     state = models.CharField(max_length=12, choices=CHOICES,
                              default='To translate', null=False, blank=False)
     total_reviews = models.IntegerField(default=0)
     position = models.IntegerField(blank=True, null=True)
-    translator_username = models.CharField(max_length=50, null=True, blank=True)
     fragment_translate = models.TextField(null=True, blank=True)
+    fragment_translator = models.CharField(max_length=50, null=True,
+                                           blank=True)
 
     def get_type(self) -> str:
         return 'text'
@@ -88,7 +90,7 @@ class TextFragment(TextComponent):
     def get_price(self) -> float:
         return self.price
 
-        
+
     def notify_observers(self, next_state):
         oberserver_author = ConcreteObserverAuthor()
         oberserver_translator = ConcreteObserverTranslator()
@@ -105,10 +107,11 @@ class TextFragment(TextComponent):
 
 class Review(models.Model):
     fragment = models.ForeignKey(TextFragment, on_delete=models.SET_NULL,
-                                    null=True)
+                                 null=True)
     review_username = models.CharField(max_length=50, null=False, blank=False)
     comment = models.TextField()
     approve = models.BooleanField(default=False)
+
 
 
 
@@ -148,7 +151,7 @@ class ConcreteObserverAuthor(Observer):
         notification.message = message
 
         notification.save()
-        
+
 
 
 class ConcreteObserverTranslator(Observer):
@@ -167,11 +170,11 @@ class ConcreteObserverTranslator(Observer):
 
         notification = Notification()
         notification.text_id = parent_fragment.text
-        notification.target_username = parent_fragment.translator_username
+        notification.target_username = parent_fragment.fragment_translator
         notification.message = message
 
         notification.save()
-        
+
 
 
 class ConcreteObserverRevisor(Observer):
@@ -198,7 +201,7 @@ class ConcreteObserverRevisor(Observer):
         notification.target_username = parent_review.review_username
         notification.message = message
         notification.save()
-        
+
 
 
 
@@ -209,3 +212,12 @@ class Notification(models.Model):
     target_username = models.CharField(max_length=50, null=False, blank=False)
     message = models.TextField(null=False, blank=False)
     is_seen = models.BooleanField(default=False)
+
+# @receiver(post_save, sender=settings.REVIEW_FRAGMENT_DB)
+# def create_fragment_validator(sender, instance=None,
+#                               created=False, **kwargs):
+#     """
+#     Verify if the same review is the translator, and don't permit if the same
+#     reviewer get more than 30% of fragments.
+#     """
+#     fragment = self.request.

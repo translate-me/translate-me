@@ -1,5 +1,10 @@
 from text.permissions import ServiceAuthenticationDjango
-from text.utils import FragmentIterator, create_fragment
+from rest_framework import serializers
+from text.utils import (
+    FragmentIterator,
+    percent_of_fragments,
+)
+from text.messages import Messages
 from rest_framework import generics
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -25,6 +30,7 @@ from text.serializers import (
     # Serializer Fragment
     TextFragmentSerializerAddAndUpdate,
     TextFragmentSerializerList,
+    TextFragmentAddTranslatorSerializer,
     # Serializer Review
     ReviewSerializerAddAndUpdate,
     ReviewSerializerList,
@@ -32,6 +38,7 @@ from text.serializers import (
     NotificationSerializer,
 )
 
+MESSAGES = Messages()
 
 """ Category controller."""
 
@@ -59,6 +66,7 @@ class UpdateDestroyListCategory(generics.RetrieveUpdateDestroyAPIView):
 
 """ Text controller"""
 
+
 # Create class
 class AddNewText(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
@@ -75,10 +83,10 @@ class AddNewText(generics.CreateAPIView):
         try:
             _ = [done for done in FragmentIterator(fragments, text)]
         except Exception as erro:
-            return JsonResponse({'status': False, 'message': erro})
+            raise serializers.ValidationError(erro)
         text.save_fragments()
-        message = "Texto salvo e fragmentado"
-        return JsonResponse({'status': True, 'message': message})
+        return JsonResponse({'status': True,
+                             'message': MESSAGES.SUCESS_SAVE_TEXT})
 
 
 # List class
@@ -128,6 +136,42 @@ class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
         instanced_fragment.notify_observers(next_state)
         serializer.save()
 
+class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentAddTranslatorSerializer
+
+    def perform_update(self, serializer):
+        """
+        Verify fragment's percent can person allow to get.
+        """
+        data = self.request.data
+        if not percent_of_fragments(data['fragment_translator'],
+                                    data['text']):
+            raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
+        serializer.save()
+
+
+class FragmentToReview(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextFragmentSerializerList
+
+    def get_queryset(self):
+        """
+        Filter queryset to not get fragments with the same translator and
+        author to review.
+        """
+        username = self.kwargs['username']
+        texts = Text.objects.filter(author=username)
+        id_texts = [text.id for text in texts]
+        fragments = TextFragment.objects.exclude(
+            fragment_translator=username
+        ).exclude(
+            text__in=id_texts
+        )
+        return fragments
+
+
 """ Review."""
 
 
@@ -136,6 +180,22 @@ class AddNewReview(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerAddAndUpdate
+
+    def perform_create(self, serializer):
+        """
+        Verify if reviewer can get the fragment.
+        """
+        instance = serializer.data
+        fragment = TextFragment.objects.get(id=instance['fragment'])
+        translator = fragment.fragment_translator
+        text_author = fragment.text.author
+        # The translator and review is the same
+        if instance['review_username'] == translator:
+            raise serializers.ValidationError(MESSAGES.ERRO_SAME_USER)
+        # The review and author is the same
+        if instance['review_username'] == text_author:
+            raise serializers.ValidationError(MESSAGES.ERRO_SAME_AUTHOR)
+        serializer.save()
 
 
 

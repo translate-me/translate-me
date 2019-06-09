@@ -95,7 +95,7 @@ DATABASES = {
         'PORT': 5435,
     }
 }
-
+# REVIEW_FRAGMENT_DB = "text.Review"
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
