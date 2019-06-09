@@ -57,12 +57,14 @@ class TextFragmentSerializerAddAndUpdate(serializers.ModelSerializer):
     class Meta:
         model = TextFragment
         fields = [
-            'text_id',
+            'text',
             'body',
             'price',
             'state',
-            'review_username',
-            'total_reviews'
+            'total_reviews',
+            'position',
+            'translator_username',
+            'fragment_translate',
         ]
 
 

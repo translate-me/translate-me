@@ -1,5 +1,4 @@
 from django.db import models
-
 import json
 from typing import List
 
@@ -79,6 +78,7 @@ class TextFragment(TextComponent):
                              default='To translate', null=False, blank=False)
     total_reviews = models.IntegerField(default=0)
     position = models.IntegerField(blank=True, null=True)
+    translator_username = models.CharField(max_length=50, null=True, blank=True)
     fragment_translate = models.TextField(null=True, blank=True)
 
     def get_type(self) -> str:
@@ -87,12 +87,7 @@ class TextFragment(TextComponent):
     def get_price(self) -> float:
         return self.price
 
-
-    def change_state(self, next_state):
-        self.notify_observers(next_state)
-        self.state = next_state
-
-
+        
     def notify_observers(self, next_state):
         oberserver_author = ConcreteObserverAuthor()
         oberserver_translator = ConcreteObserverTranslator()
@@ -134,10 +129,21 @@ class ConcreteObserverAuthor(Observer):
     observer_type = "Author"
 
     def notify(self, fragment_id, previous_state, actual_state) -> None:
-        print(self.observer_type)
-        print(fragment_id)
-        print(previous_state)
-        print(actual_state)
+        message = "empty"
+        if (previous_state == '1') and (actual_state == '2'):
+            message = "One of your fragments have been assigned!"
+        elif (previous_state == '2') and (actual_state == '3'):
+            message = "Almost Done! One of your fragments is being reviewd!"
+    
+        
+
+        
+
+            
+
+
+
+        
 
 
 class ConcreteObserverTranslator(Observer):
@@ -145,25 +151,21 @@ class ConcreteObserverTranslator(Observer):
     observer_type = "Translator"
 
     def notify(self, fragment_id, previous_state, actual_state) -> None:
-        print(self.observer_type)
-        print(fragment_id)
-        print(previous_state)
-        print(actual_state)
+        pass
+        
+
 
 class ConcreteObserverRevisor(Observer):
 
     observer_type = "Revisor"
 
     def notify(self,  fragment_id, previous_state, actual_state) -> None:
-        print(self.observer_type)
-        print(fragment_id)
-        print(previous_state)
-        print(actual_state)
+        pass
+        
 
 
 class Notification(models.Model):
-    text_id = models.ForeignKey(Text, on_delete=models.SET_NULL,
-                                null=True)
+    text_id = models.ForeignKey(Text, on_delete=models.SET_NULL,null=True)
     target_username = models.CharField(max_length=50, null=False, blank=False)
-    message = models.CharField(max_length=500, null=False, blank=False)
+    message = models.TextField(null=False, blank=False)
     is_seen = models.BooleanField(default=False)

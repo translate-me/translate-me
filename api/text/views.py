@@ -24,12 +24,11 @@ from text.serializers import (
     # Serializer Fragment
     TextFragmentSerializerAddAndUpdate,
     TextFragmentSerializerList,
-    FragmentStateSerializer,
     # Serializer Review
     ReviewSerializerAddAndUpdate,
     ReviewSerializerList,
     # Serializer Notification
-    NotificationSerializer,
+    # NotificationSerializer,
 )
 
 
@@ -118,17 +117,17 @@ class ListFragments(generics.ListAPIView):
 class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = TextFragment.objects.all()
-    serializer_class = TextFragmentSerializerList
-
-class ChangeStateFragment(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    queryset = TextFragment.objects.all()
-    serializer_class = FragmentStateSerializer
+    serializer_class = TextFragmentSerializerAddAndUpdate
 
     def perform_update(self, serializer):
-        interest_fragment = Fragment.objects.get(id=1)
-        interest_fragment.change_state('Translating')
+        data = self.request.data
+        fragment_id = self.kwargs['pk']
+        next_state = data['state']
+        instanced_fragment = TextFragment.objects.get(id=fragment_id)
+        instanced_fragment.notify_observers(next_state)
         serializer.save()
+
+
 
 
 """ Review."""

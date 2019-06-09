@@ -12,7 +12,6 @@ from text.views import (
     AddNewReview,
     ListReviews,
     UpdateDestroyListReview,
-    ChangeStateFragment,
 )
 
 urlpatterns = [
@@ -39,9 +38,6 @@ urlpatterns = [
         name="list_fragments"),
     url(r'^api/v0/fragment/(?P<option>update|delete|detail)/(?P<pk>[0-9]+)$',
         UpdateDestroyListFragment.as_view(),
-        name="update_destroy_and_detail_fragment"),
-    url(r'^api/v0/fragment/state/(?P<option>update|delete|detail)/(?P<pk>[0-9]+)$',
-        ChangeStateFragment.as_view(),
         name="update_destroy_and_detail_fragment"),
     # Review
     url(r'^api/v0/review/create/$', AddNewReview.as_view(),
