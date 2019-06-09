@@ -1,4 +1,7 @@
 from django.db import models
+# from django.conf import settings
+# from django.db.models.signals import post_save
+# from django.dispatch import receiver
 from typing import List
 CHOICES = (
     ('1', 'To translate'),
@@ -20,7 +23,7 @@ class Category(models.Model):
 
 
 class TextComponent(models.Model):
-    
+
     def get_price(self) -> float:
         pass
 
@@ -39,7 +42,6 @@ class Text(TextComponent):
     categories = models.ManyToManyField(Category)
     text_translate = models.TextField(null=True, blank=True)
 
-
     def init(self) -> None:
         self.children: List[TextComponent] = []
 
@@ -47,7 +49,7 @@ class Text(TextComponent):
         self.children.append(text_component)
 
     def get_fragments(self) -> str:
-        self.children.sort(key=lambda x: x.position) 
+        self.children.sort(key=lambda x: x.position)
         return self.children
 
     def get_price(self) -> float:
@@ -55,7 +57,7 @@ class Text(TextComponent):
         for i in self.children:
             price += i.get_price()
         return price
-    
+
     def save_fragments(self) -> None:
         position = 1
         for i in self.children:
@@ -69,7 +71,7 @@ class Text(TextComponent):
 
 class TextFragment(TextComponent):
     text = models.ForeignKey(Text, on_delete=models.SET_NULL,
-                                null=True)
+                             null=True)
     body = models.TextField(null=False, blank=False)
     price = models.FloatField(default=0)
     state = models.CharField(max_length=12, choices=CHOICES,
@@ -77,10 +79,12 @@ class TextFragment(TextComponent):
     total_reviews = models.IntegerField(default=0)
     position = models.IntegerField(blank=True, null=True)
     fragment_translate = models.TextField(null=True, blank=True)
+    fragment_translator = models.CharField(max_length=50, null=True,
+                                           blank=True)
 
     def get_type(self) -> str:
         return 'text'
-    
+
     def get_price(self) -> float:
         return self.price
 
@@ -90,7 +94,17 @@ class TextFragment(TextComponent):
 
 class Review(models.Model):
     fragment = models.ForeignKey(TextFragment, on_delete=models.SET_NULL,
-                                    null=True)
+                                 null=True)
     review_username = models.CharField(max_length=50, null=False, blank=False)
     comment = models.TextField()
     approve = models.BooleanField(default=False)
+
+
+# @receiver(post_save, sender=settings.REVIEW_FRAGMENT_DB)
+# def create_fragment_validator(sender, instance=None,
+#                               created=False, **kwargs):
+#     """
+#     Verify if the same review is the translator, and don't permit if the same
+#     reviewer get more than 30% of fragments.
+#     """
+#     fragment = self.request.
