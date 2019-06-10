@@ -78,8 +78,17 @@ class TextFragmentAddTranslatorSerializer(serializers.ModelSerializer):
         fields = [
             'text',
             'fragment_translator',
+            'state',
         ]
 
+
+class TextFragmentUpdateTranslate(serializers.ModelSerializer):
+    class Meta:
+        model = TextFragment
+        fields = [
+            'fragment_translate',
+            'state',
+        ]
 
 """ Review."""
 

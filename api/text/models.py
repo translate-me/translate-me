@@ -188,19 +188,20 @@ class ConcreteObserverRevisor(Observer):
         else:
             return
         parent_fragment = TextFragment.objects.get(id=fragment_id)
-        parent_review = None
+        reviews = []
         try:
-            parent_review = Review.objects.get(fragment=fragment_id)
-            print(parent_review)
+            reviews = Review.objects.all().filter(fragment=fragment_id)
+            print(reviews)
 
         except Review.DoesNotExist:
             return
 
-        notification = Notification()
-        notification.text_id = parent_fragment.text
-        notification.target_username = parent_review.review_username
-        notification.message = message
-        notification.save()
+        for review in reviews:
+            notification = Notification()
+            notification.text_id = parent_fragment.text
+            notification.target_username = review.review_username
+            notification.message = message
+            notification.save()
 
 
 

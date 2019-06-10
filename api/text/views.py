@@ -31,6 +31,7 @@ from text.serializers import (
     TextFragmentSerializerAddAndUpdate,
     TextFragmentSerializerList,
     TextFragmentAddTranslatorSerializer,
+    TextFragmentUpdateTranslate,
     # Serializer Review
     ReviewSerializerAddAndUpdate,
     ReviewSerializerList,
@@ -129,9 +130,8 @@ class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TextFragmentSerializerAddAndUpdate
 
     def perform_update(self, serializer):
-        data = self.request.data
         fragment_id = self.kwargs['pk']
-        next_state = data['state']
+        next_state = self.request.data['state']
         instanced_fragment = TextFragment.objects.get(id=fragment_id)
         instanced_fragment.notify_observers(next_state)
         serializer.save()
@@ -171,6 +171,18 @@ class FragmentToReview(generics.ListAPIView):
         )
         return fragments
 
+class FragmentUpdateTranslate(generics.UpdateAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextFragmentUpdateTranslate
+
+    def perform_update(self, serializer):
+        """
+        Update text that translator is translator, for a routine 
+        save or for sending the final translation
+        """
+         
+
+
 
 """ Review."""
 
@@ -187,6 +199,7 @@ class AddNewReview(generics.CreateAPIView):
         """
         instance = serializer.validated_data
         fragment = instance['fragment']
+        fragment.notify_observers(instance['state'])
         translator = fragment.fragment_translator
         text_author = fragment.text.author
         # The translator and review is the same
