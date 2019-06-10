@@ -119,7 +119,7 @@ class ListFragments(generics.ListAPIView):
     queryset = TextFragment.objects.all()
     serializer_class = TextFragmentSerializerList
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('id', 'text__language', 'text__categories')
+    filterset_fields = ('id', 'text__language', 'text__categories', 'text__level')
 
 
 # Update, detail, patch and destroy class
