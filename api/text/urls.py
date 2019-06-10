@@ -14,6 +14,8 @@ from text.views import (
     AddNewReview,
     ListReviews,
     UpdateDestroyListReview,
+    ListNotification,
+    UpdateDestroyListNotification,
 )
 
 urlpatterns = [
@@ -54,4 +56,11 @@ urlpatterns = [
     url(r'^api/v0/review/(?P<option>update|delete|detail)/(?P<pk>[0-9]+)$',
         UpdateDestroyListReview.as_view(),
         name="update_destroy_and_detail_review"),
+    # Notifications
+    url(r'^api/v0/notification/list/$', ListNotification.as_view(),
+        name="list_Notification"),
+    url(r'^api/v0/notification/(?P<option>update|delete|detail)/(?P<pk>[0-9]+)$',
+        UpdateDestroyListNotification.as_view(),
+        name="update_destroy_and_detail_notification"),
+
 ]

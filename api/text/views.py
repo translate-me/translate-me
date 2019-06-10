@@ -15,7 +15,10 @@ from text.models import (
     Category,
     Text,
     TextFragment,
-    Review
+    Review,
+    Observer,
+    ConcreteObserverAuthor,
+    Notification,
 )
 from text.serializers import (
     # Serializer category
@@ -31,6 +34,8 @@ from text.serializers import (
     # Serializer Review
     ReviewSerializerAddAndUpdate,
     ReviewSerializerList,
+    # Serializer Notification
+    NotificationSerializer,
 )
 
 MESSAGES = Messages()
@@ -121,8 +126,15 @@ class ListFragments(generics.ListAPIView):
 class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = TextFragment.objects.all()
-    serializer_class = TextFragmentSerializerList
+    serializer_class = TextFragmentSerializerAddAndUpdate
 
+    def perform_update(self, serializer):
+        data = self.request.data
+        fragment_id = self.kwargs['pk']
+        next_state = data['state']
+        instanced_fragment = TextFragment.objects.get(id=fragment_id)
+        instanced_fragment.notify_observers(next_state)
+        serializer.save()
 
 class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
@@ -173,8 +185,8 @@ class AddNewReview(generics.CreateAPIView):
         """
         Verify if reviewer can get the fragment.
         """
-        instance = serializer.data
-        fragment = TextFragment.objects.get(id=instance['fragment'])
+        instance = serializer.validated_data
+        fragment = instance['fragment']
         translator = fragment.fragment_translator
         text_author = fragment.text.author
         # The translator and review is the same
@@ -184,6 +196,9 @@ class AddNewReview(generics.CreateAPIView):
         if instance['review_username'] == text_author:
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_AUTHOR)
         serializer.save()
+
+
+
 
 
 # List class
@@ -198,3 +213,18 @@ class UpdateDestroyListReview(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerList
+
+""" Notification."""
+
+# List Notification
+class ListNotification(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+
+# Update, detail, patch and destroy class
+class UpdateDestroyListNotification(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    
