@@ -77,7 +77,7 @@ class TextFragment(TextComponent):
     body = models.TextField(null=False, blank=False)
     price = models.FloatField(default=0)
     state = models.CharField(max_length=12, choices=CHOICES,
-                             default='To translate', null=False, blank=False)
+                             default='1', null=False, blank=False)
     total_reviews = models.IntegerField(default=0)
     position = models.IntegerField(blank=True, null=True)
     fragment_translate = models.TextField(null=True, blank=True)
