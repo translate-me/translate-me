@@ -40,7 +40,6 @@ from text.serializers import (
 
 MESSAGES = Messages()
 
-
 """ Category controller."""
 
 
@@ -117,18 +116,10 @@ class AddNewFragment(generics.CreateAPIView):
 # List class
 class ListFragments(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
     serializer_class = TextFragmentSerializerList
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('id', 'text__language', 'text__categories', 'text__level')
-
-    def get_queryset(self):
-        username = self.kwargs['username']
-        queryset = TextFragment.objects.exclude(
-            fragment_translator=username
-        ).exclude(
-            text__author=username
-        )
-        return queryset
 
 
 # Update, detail, patch and destroy class
@@ -161,6 +152,26 @@ class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
 
 
+class FragmentToReview(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextFragmentSerializerList
+
+    def get_queryset(self):
+        """
+        Filter queryset to not get fragments with the same translator and
+        author to review.
+        """
+        username = self.kwargs['username']
+        texts = Text.objects.filter(author=username)
+        id_texts = [text.id for text in texts]
+        fragments = TextFragment.objects.exclude(
+            fragment_translator=username
+        ).exclude(
+            text__in=id_texts
+        )
+        return fragments
+
+
 """ Review."""
 
 
@@ -185,6 +196,10 @@ class AddNewReview(generics.CreateAPIView):
         if instance['review_username'] == text_author:
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_AUTHOR)
         serializer.save()
+
+
+
+
 
 # List class
 class ListReviews(generics.ListAPIView):

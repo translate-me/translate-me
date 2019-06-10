@@ -45,8 +45,8 @@ class FragmentIterator:
 
 
 def percent_of_fragments(username, text_id):
-    fragments = TextFragment.objects.filter(text=text_id)
-    username_fragments = TextFragment.objects.filter(
+    fragments = TextFragment.objects.all().filter(text=text_id)
+    username_fragments = TextFragment.objects.all().filter(
         text=text_id).filter(fragment_translator=username)
     total_fragments = float(len(fragments))
     username_fragments = float(len(username_fragments))
