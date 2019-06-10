@@ -3,7 +3,8 @@ from text.models import (
     Category,
     Text,
     TextFragment,
-    Review
+    Review,
+    Notification,
 )
 
 """ Category."""
@@ -33,6 +34,7 @@ class TextSerializerAddAndUpdate(serializers.ModelSerializer):
         fields = [
             'id',
             # 'body',
+            'author',
             'total_fragments',
             'fragments_done',
             'fragments_revision',
@@ -96,4 +98,12 @@ class ReviewSerializerAddAndUpdate(serializers.ModelSerializer):
 class ReviewSerializerList(serializers.ModelSerializer):
     class Meta:
         model = Review
+        fields = "__all__"
+
+
+""" Notification."""
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
         fields = "__all__"
