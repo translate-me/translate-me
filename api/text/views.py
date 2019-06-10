@@ -41,6 +41,7 @@ from text.serializers import (
 
 MESSAGES = Messages()
 
+
 """ Category controller."""
 
 
@@ -117,10 +118,18 @@ class AddNewFragment(generics.CreateAPIView):
 # List class
 class ListFragments(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    queryset = TextFragment.objects.all()
     serializer_class = TextFragmentSerializerList
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('id', 'text__language', 'text__categories')
+    filterset_fields = ('id', 'text__language', 'text__categories', 'text__level')
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        queryset = TextFragment.objects.exclude(
+            fragment_translator=username
+        ).exclude(
+            text__author=username
+        )
+        return queryset
 
 
 # Update, detail, patch and destroy class
@@ -152,24 +161,6 @@ class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
 
 
-class FragmentToReview(generics.ListAPIView):
-    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    serializer_class = TextFragmentSerializerList
-
-    def get_queryset(self):
-        """
-        Filter queryset to not get fragments with the same translator and
-        author to review.
-        """
-        username = self.kwargs['username']
-        texts = Text.objects.filter(author=username)
-        id_texts = [text.id for text in texts]
-        fragments = TextFragment.objects.exclude(
-            fragment_translator=username
-        ).exclude(
-            text__in=id_texts
-        )
-        return fragments
 
 class FragmentUpdateTranslate(generics.UpdateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
@@ -177,10 +168,11 @@ class FragmentUpdateTranslate(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         """
-        Update text that translator is translator, for a routine 
+        Update text that is being translated, for a routine
         save or for sending the final translation
         """
-         
+
+
 
 
 
@@ -210,10 +202,6 @@ class AddNewReview(generics.CreateAPIView):
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_AUTHOR)
         serializer.save()
 
-
-
-
-
 # List class
 class ListReviews(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
@@ -240,4 +228,3 @@ class UpdateDestroyListNotification(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-    
