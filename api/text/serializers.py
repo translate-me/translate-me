@@ -41,7 +41,8 @@ class TextSerializerAddAndUpdate(serializers.ModelSerializer):
             'fragments_doing',
             'context',
             'language',
-            'categories'
+            'categories',
+            'level'
         ]
 
 
@@ -62,7 +63,7 @@ class TextFragmentSerializerAddAndUpdate(serializers.ModelSerializer):
             'body',
             'price',
             'state',
-            'total_reviews'
+            'total_reviews',
         ]
 
 

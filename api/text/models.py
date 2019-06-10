@@ -14,6 +14,12 @@ CHOICES = (
     ('6', 'Finished')
 )
 
+LEVELS = (
+    ('1', 'Low'),
+    ('2', 'Average'),
+    ('3', 'High'),
+)
+
 """ Text."""
 
 
@@ -43,6 +49,8 @@ class Text(TextComponent):
     language = models.IntegerField(null=False, blank=False)
     categories = models.ManyToManyField(Category)
     text_translate = models.TextField(null=True, blank=True)
+    level = models.CharField(max_length=7, choices=LEVELS,
+                             default='1', null=False, blank=False)
 
     def init(self) -> None:
         self.children: List[TextComponent] = []
