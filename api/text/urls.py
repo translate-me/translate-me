@@ -10,7 +10,6 @@ from text.views import (
     ListFragments,
     UpdateDestroyListFragment,
     FragmentTranslatorRelation,
-    FragmentToReview,
     AddNewReview,
     ListReviews,
     UpdateDestroyListReview,
@@ -38,7 +37,7 @@ urlpatterns = [
     # Fragment
     url(r'^api/v0/fragment/create/$', AddNewFragment.as_view(),
         name="create_new_fragment"),
-    url(r'^api/v0/fragment/list/$', ListFragments.as_view(),
+    url(r'^api/v0/fragment/list/(?P<username>\w+)/$', ListFragments.as_view(),
         name="list_fragments"),
     url(r'^api/v0/fragment/(?P<option>update|delete|detail)/(?P<pk>[0-9]+)$',
         UpdateDestroyListFragment.as_view(),
@@ -46,8 +45,6 @@ urlpatterns = [
     url(r'^api/v0/fragment/add_translator/(?P<pk>[0-9]+)/$',
         FragmentTranslatorRelation.as_view(),
         name="add_relation_fragment_translator"),
-    url(r'^api/v0/fragment/get_fragment/(?P<username>\w+)/$',
-        FragmentToReview.as_view(), name="fragment_to_review"),
     # Review
     url(r'^api/v0/review/create/$', AddNewReview.as_view(),
         name="create_new_review"),
