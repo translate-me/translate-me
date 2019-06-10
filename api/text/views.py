@@ -185,8 +185,8 @@ class AddNewReview(generics.CreateAPIView):
         """
         Verify if reviewer can get the fragment.
         """
-        instance = serializer.data
-        fragment = TextFragment.objects.get(id=instance['fragment'])
+        instance = serializer.validated_data
+        fragment = instance['fragment']
         translator = fragment.fragment_translator
         text_author = fragment.text.author
         # The translator and review is the same
