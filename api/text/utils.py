@@ -1,5 +1,5 @@
 """ Class to use methods that can't stay in views.py"""
-from text.models import TextFragment, Text
+from text.models import TextFragment
 
 
 def create_fragment(fragment, text):
@@ -45,15 +45,15 @@ class FragmentIterator:
 
 
 def get_all_fragments(text):
-    # text = Text.objects.get(id=text_id)
-    # text.init()
-
     """
     Inserts the text fragments in text
     """
     text_fragments = TextFragment.objects.filter(text=text)
     for i in text_fragments:
-        text.add(i)  
+        text.add(i)
+
+    # It's possible to add more fragments types
+    text.sort_fragments()  
 
 
 def percent_of_fragments(username, text_id):

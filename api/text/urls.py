@@ -4,7 +4,7 @@ from text.views import (
     ListCategories,
     UpdateDestroyListCategory,
     AddNewText,
-    ListTexts,
+    ListTextsByAuthor,
     ListTranslatedText,
     UpdateDestroyListText,
     AddNewFragment,
@@ -32,7 +32,7 @@ urlpatterns = [
     # Text
     url(r'^api/v0/text/create/$', AddNewText.as_view(),
         name="create_new_text"),
-    url(r'^api/v0/text/list/texts$', ListTexts.as_view(),
+    url(r'^api/v0/text/list/texts_by_author/(?P<author>\w+)$', ListTextsByAuthor.as_view(),
         name="list_texts"),
     url(r'^api/v0/text/list/translated_text/(?P<id_text>[0-9]+)$', ListTranslatedText.as_view(),
         name="list_translated_text"),

@@ -102,15 +102,19 @@ class ListTranslatedText(generics.ListAPIView):
         text.init()
 
         get_all_fragments(text)
-        text.sort_fragments()
-        print(text.get_price())
-        return Text.objects.all()
+        text.translated_text = text.get_content()
+        text.save()
+        return [text]
 
 # List class
-class ListTexts(generics.ListAPIView):
+class ListTextsByAuthor(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    queryset = Text.objects.all()
     serializer_class = TextSerializerList
+
+    def get_queryset(self):
+        author = self.kwargs['author']
+        texts = Text.objects.filter(author=author)
+        return texts
 
 
 # Update, detail, patch and destroy class
