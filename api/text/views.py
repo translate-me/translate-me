@@ -3,6 +3,7 @@ from rest_framework import serializers
 from text.utils import (
     FragmentIterator,
     percent_of_fragments,
+    get_all_fragments
 )
 from text.messages import Messages
 from rest_framework import generics
@@ -89,6 +90,21 @@ class AddNewText(generics.CreateAPIView):
         return JsonResponse({'status': True,
                              'message': MESSAGES.SUCESS_SAVE_TEXT})
 
+
+# List translated text
+class ListTranslatedText(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextSerializerList
+
+    def get_queryset(self):
+        id_text = self.kwargs['id_text']
+        text = Text.objects.get(id=id_text)
+        text.init()
+
+        get_all_fragments(text)
+        text.sort_fragments()
+        print(text.get_price())
+        return Text.objects.all()
 
 # List class
 class ListTexts(generics.ListAPIView):

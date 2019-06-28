@@ -35,6 +35,9 @@ class TextComponent(models.Model):
     def get_price(self) -> float:
         pass
 
+    def get_content(self) -> str:
+        pass
+
     class Meta:
         abstract = True
 
@@ -58,15 +61,18 @@ class Text(TextComponent):
     def add(self, text_component) -> None:
         self.children.append(text_component)
 
-    def get_fragments(self) -> str:
+    def sort_fragments(self) -> str:
         self.children.sort(key=lambda x: x.position)
-        return self.children
 
     def get_price(self) -> float:
         price = 0
         for i in self.children:
             price += i.get_price()
         return price
+
+    def get_content(self) -> str:
+        # for i in self.children
+        pass
 
     def save_fragments(self) -> None:
         position = 1
