@@ -44,6 +44,18 @@ class FragmentIterator:
             raise StopIteration
 
 
+def get_all_fragments(text):
+    """
+    Inserts the text fragments in text
+    """
+    text_fragments = TextFragment.objects.filter(text=text)
+    for i in text_fragments:
+        text.add(i)
+
+    # It's possible to add more fragments types
+    text.sort_fragments()  
+
+
 def percent_of_fragments(username, text_id):
     fragments = TextFragment.objects.filter(text=text_id)
     username_fragments = TextFragment.objects.filter(
