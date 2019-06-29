@@ -3,6 +3,7 @@ from rest_framework import serializers
 from text.utils import (
     FragmentIterator,
     percent_of_fragments,
+    get_all_fragments
 )
 from text.messages import Messages
 from rest_framework import generics
@@ -68,7 +69,6 @@ class UpdateDestroyListCategory(generics.RetrieveUpdateDestroyAPIView):
 
 """ Text controller"""
 
-
 # Create class
 class AddNewText(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
@@ -91,11 +91,30 @@ class AddNewText(generics.CreateAPIView):
                              'message': MESSAGES.SUCESS_SAVE_TEXT})
 
 
-# List class
-class ListTexts(generics.ListAPIView):
+# List translated text
+class ListTranslatedText(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    queryset = Text.objects.all()
     serializer_class = TextSerializerList
+
+    def get_queryset(self):
+        id_text = self.kwargs['id_text']
+        text = Text.objects.get(id=id_text)
+        text.init()
+
+        get_all_fragments(text)
+        text.translated_text = text.get_content()
+        text.save()
+        return [text]
+
+# List class
+class ListTextsByAuthor(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextSerializerList
+
+    def get_queryset(self):
+        author = self.kwargs['author']
+        texts = Text.objects.filter(author=author)
+        return texts
 
 
 # Update, detail, patch and destroy class
@@ -116,11 +135,29 @@ class AddNewFragment(generics.CreateAPIView):
 
 
 # List class
-class ListFragments(generics.ListAPIView):
+class GenericListFragments(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     serializer_class = TextFragmentSerializerList
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('id', 'text__language', 'text__categories', 'text__level')
+
+class ListFragmentsByText(GenericListFragments):
+    """
+    Filter fragments by text id
+    """
+
+    def get_queryset(self):
+        text_id = self.kwargs['text_id']
+        queryset = TextFragment.objects.filter(
+            text__id=text_id
+        )
+        return queryset
+
+class ListAvailableFragments(GenericListFragments):
+    """
+    List available fragments to translate or review
+    """
+
+    filterset_fields = ('text__language', 'text__categories', 'text__level')
 
     def get_queryset(self):
         username = self.kwargs['username']
@@ -131,6 +168,17 @@ class ListFragments(generics.ListAPIView):
         )
         return queryset
 
+class ListTranslatorFragments(GenericListFragments):
+    """
+    List all fragments a translator is translating
+    """
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        queryset = TextFragment.objects.filter(
+            fragment_translator=username
+        )
+        return queryset
 
 # Update, detail, patch and destroy class
 class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
@@ -164,6 +212,7 @@ class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
 
 class FragmentUpdateTranslate(generics.UpdateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
     serializer_class = TextFragmentUpdateTranslate
 
     def perform_update(self, serializer):
@@ -171,8 +220,34 @@ class FragmentUpdateTranslate(generics.UpdateAPIView):
         Update text that is being translated, for a routine
         save or for sending the final translation
         """
+        fragment_id = self.kwargs['pk']
+        next_state = self.request.data['state']
+        instanced_fragment = TextFragment.objects.get(id=fragment_id)
+        instanced_fragment.notify_observers(next_state)
+        serializer.save()
+    
 
 
+
+
+class FragmentToReview(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextFragmentSerializerList
+
+    def get_queryset(self):
+        """
+        Filter queryset to not get fragments with the same translator and
+        author to review.
+        """
+        username = self.kwargs['username']
+        texts = Text.objects.filter(author=username)
+        id_texts = [text.id for text in texts]
+        fragments = TextFragment.objects.exclude(
+            fragment_translator=username
+        ).exclude(
+            text__in=id_texts
+        )
+        return fragments
 
 
 

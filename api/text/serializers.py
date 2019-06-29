@@ -87,7 +87,7 @@ class TextFragmentUpdateTranslate(serializers.ModelSerializer):
     class Meta:
         model = TextFragment
         fields = [
-            'fragment_translate',
+            'translated_fragment',
             'state',
         ]
 
