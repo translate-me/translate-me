@@ -91,6 +91,7 @@ class TextFragment(TextComponent):
     fragment_translate = models.TextField(null=True, blank=True)
     fragment_translator = models.CharField(max_length=50, null=True,
                                            blank=True)
+    total_words = models.IntegerField(blank=True)
 
     def get_type(self) -> str:
         return 'text'
