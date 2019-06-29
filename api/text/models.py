@@ -35,6 +35,9 @@ class TextComponent(models.Model):
     def get_price(self) -> float:
         pass
 
+    def get_content(self) -> str:
+        pass
+
     class Meta:
         abstract = True
 
@@ -48,7 +51,7 @@ class Text(TextComponent):
     author = models.CharField(max_length=50, null=False, blank=False)
     language = models.IntegerField(null=False, blank=False)
     categories = models.ManyToManyField(Category)
-    text_translate = models.TextField(null=True, blank=True)
+    translated_text = models.TextField(null=True, blank=True)
     level = models.CharField(max_length=7, choices=LEVELS,
                              default='1', null=False, blank=False)
 
@@ -58,9 +61,8 @@ class Text(TextComponent):
     def add(self, text_component) -> None:
         self.children.append(text_component)
 
-    def get_fragments(self) -> str:
+    def sort_fragments(self) -> None:
         self.children.sort(key=lambda x: x.position)
-        return self.children
 
     def get_price(self) -> float:
         price = 0
@@ -68,6 +70,13 @@ class Text(TextComponent):
             price += i.get_price()
         return price
 
+    def get_content(self) -> str:
+        translated_text = ""
+        for i in self.children:
+            translated_text += i.get_content()
+
+        return translated_text
+        
     def save_fragments(self) -> None:
         position = 1
         for i in self.children:
@@ -88,7 +97,7 @@ class TextFragment(TextComponent):
                              default='1', null=False, blank=False)
     total_reviews = models.IntegerField(default=0)
     position = models.IntegerField(blank=True, null=True)
-    fragment_translate = models.TextField(null=True, blank=True)
+    translated_fragment = models.TextField(default="")
     fragment_translator = models.CharField(max_length=50, null=True,
                                            blank=True)
     total_words = models.IntegerField(blank=True)
@@ -99,6 +108,8 @@ class TextFragment(TextComponent):
     def get_price(self) -> float:
         return self.price
 
+    def get_content(self) -> str:
+        return str(self.translated_fragment)
 
     def notify_observers(self, next_state):
         oberserver_author = ConcreteObserverAuthor()
