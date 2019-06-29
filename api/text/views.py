@@ -180,6 +180,8 @@ class ListTranslatorFragments(GenericListFragments):
         )
         return queryset
 
+
+
 # Update, detail, patch and destroy class
 class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]

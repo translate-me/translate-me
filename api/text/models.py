@@ -73,7 +73,7 @@ class Text(TextComponent):
     def get_content(self) -> str:
         translated_text = ""
         for i in self.children:
-            translated_text += i.get_content()
+            translated_text += i.get_content() + " "
 
         return translated_text
         
