@@ -202,12 +202,17 @@ class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
         """
         Verify fragment's percent can person allow to get.
         """
+        fragment_id = self.kwargs['pk']
+        instanced_fragment = TextFragment.objects.get(id=fragment_id)
+        text_id = instanced_fragment.text
         data = self.request.data
         if not percent_of_fragments(data['fragment_translator'],
-                                    data['text']):
+                                    text_id):
             raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
+        next_state = data['state']
+        
+        instanced_fragment.notify_observers(next_state)
         serializer.save()
-
 
 
 class FragmentUpdateTranslate(generics.UpdateAPIView):
@@ -225,9 +230,6 @@ class FragmentUpdateTranslate(generics.UpdateAPIView):
         instanced_fragment = TextFragment.objects.get(id=fragment_id)
         instanced_fragment.notify_observers(next_state)
         serializer.save()
-    
-
-
 
 
 class FragmentToReview(generics.ListAPIView):
