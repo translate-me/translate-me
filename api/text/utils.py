@@ -1,5 +1,6 @@
 """ Class to use methods that can't stay in views.py"""
 from text.models import TextFragment
+from text.models import StateInterface
 
 
 def create_fragment(fragment, text):
@@ -68,3 +69,14 @@ def percent_of_fragments(username, text_id):
     if percent_of_text >= 0.3:
         return False
     return True
+
+
+class BeginState(StateInterface):
+    
+    state_type = '1 - To translate'
+
+    def changeState(self, fragment_pk) -> None:
+        fragment = TextFragment.objects.filter(id=fragment_pk)
+        fragment.notify_observers('2')
+        fragment.state = '2'
+        fragment.save()

@@ -231,9 +231,8 @@ class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
         if not percent_of_fragments(data['fragment_translator'],
                                     text_id):
             raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
-        next_state = data['state']
         
-        instanced_fragment.notify_observers(next_state)
+        instanced_fragment.stateCaller()
         serializer.save()
 
 

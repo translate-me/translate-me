@@ -3,6 +3,7 @@ from django.db import models
 # from django.db.models.signals import post_save
 # from django.dispatch import receiver
 from typing import List
+from abc import ABCMeta, abstractmethod
 
 
 CHOICES = (
@@ -85,6 +86,17 @@ class Text(TextComponent):
             position += 1
 
 
+""" State. """
+
+class StateInterface(metaclass=ABCMeta):
+            
+    @abstractmethod
+    def changeState(self, fragment) -> None:
+        pass
+
+
+
+
 """ Fragment."""
 
 
@@ -101,6 +113,7 @@ class TextFragment(TextComponent):
     fragment_translator = models.CharField(max_length=50, null=True,
                                            blank=True)
     total_words = models.IntegerField(blank=True)
+
 
     def get_type(self) -> str:
         return 'text'
