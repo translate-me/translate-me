@@ -129,7 +129,6 @@ class TextFragment(TextComponent):
             state.change_state(self)
 
 
-
 """ Review."""
 
 
@@ -139,8 +138,6 @@ class Review(models.Model):
     review_username = models.CharField(max_length=50, null=False, blank=False)
     comment = models.TextField()
     approve = models.BooleanField(default=False)
-
-
 
 
 """ Notification """
@@ -170,7 +167,6 @@ class ConcreteObserverAuthor(Observer):
             message = "Building up! A Fragment translation is complete!"
         else:
             return
-        # parent_fragment = TextFragment.objects.get(id=fragment_id)
         parent_text = fragment.text
 
         notification = Notification()
@@ -194,7 +190,6 @@ class ConcreteObserverTranslator(Observer):
             message = "Oops! There are some corrections to make on your translation."
         else:
             return
-        # parent_fragment = TextFragment.objects.get(id=fragment_id)
 
         notification = Notification()
         notification.text_id = fragment.text

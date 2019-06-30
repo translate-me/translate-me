@@ -229,10 +229,11 @@ class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
         """
         Verify fragment's percent can person allow to get.
         """
-        fragment = serializer.save()
-        if not percent_of_fragments(fragment.fragment_translator,
-                                    fragment.text):
+        fragment = TextFragment.objects.get(id=self.kwargs['pk'])
+        translator = serializer.validated_data['fragment_translator']
+        if not percent_of_fragments(translator, fragment.text):
             raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
+        fragment = serializer.save()
         fragment.change_state('2')
         fragment.save()
 
