@@ -32,6 +32,7 @@ from text.serializers import (
     TextFragmentSerializerAddAndUpdate,
     TextFragmentSerializerList,
     TextFragmentAddTranslatorSerializer,
+    TextFragmentUpdateTranslate,
     # Serializer Review
     ReviewSerializerAddAndUpdate,
     ReviewSerializerList,
@@ -75,7 +76,6 @@ class UpdateDestroyListCategory(generics.RetrieveUpdateDestroyAPIView):
 
 
 """ Text controller"""
-
 
 # Create class
 class AddNewText(generics.CreateAPIView):
@@ -200,6 +200,8 @@ class ListTranslatorFragments(GenericListFragments):
         )
         return queryset
 
+
+
 # Update, detail, patch and destroy class
 class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
@@ -207,9 +209,8 @@ class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TextFragmentSerializerAddAndUpdate
 
     def perform_update(self, serializer):
-        data = self.request.data
         fragment_id = self.kwargs['pk']
-        next_state = data['state']
+        next_state = self.request.data['state']
         instanced_fragment = TextFragment.objects.get(id=fragment_id)
         instanced_fragment.notify_observers(next_state)
         serializer.save()
@@ -223,10 +224,33 @@ class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
         """
         Verify fragment's percent can person allow to get.
         """
+        fragment_id = self.kwargs['pk']
+        instanced_fragment = TextFragment.objects.get(id=fragment_id)
+        text_id = instanced_fragment.text
         data = self.request.data
         if not percent_of_fragments(data['fragment_translator'],
-                                    data['text']):
+                                    text_id):
             raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
+        next_state = data['state']
+        
+        instanced_fragment.notify_observers(next_state)
+        serializer.save()
+
+
+class FragmentUpdateTranslate(generics.UpdateAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentUpdateTranslate
+
+    def perform_update(self, serializer):
+        """
+        Update text that is being translated, for a routine
+        save or for sending the final translation
+        """
+        fragment_id = self.kwargs['pk']
+        next_state = self.request.data['state']
+        instanced_fragment = TextFragment.objects.get(id=fragment_id)
+        instanced_fragment.notify_observers(next_state)
         serializer.save()
 
 
@@ -250,6 +274,7 @@ class FragmentToReview(generics.ListAPIView):
         return fragments
 
 
+
 """ Review."""
 
 
@@ -265,6 +290,12 @@ class AddNewReview(generics.CreateAPIView):
         """
         instance = serializer.validated_data
         fragment = instance['fragment']
+        state_fragment = '2'
+        if (instance['approve'] == True):
+            state_fragment = '4'    
+        fragment.notify_observers(state_fragment)
+        fragment.state = state_fragment
+        fragment.save()
         translator = fragment.fragment_translator
         text_author = fragment.text.author
         # The translator and review is the same
@@ -301,4 +332,3 @@ class UpdateDestroyListNotification(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-    

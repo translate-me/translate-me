@@ -18,6 +18,7 @@ from text.views import (
     UpdateDestroyListReview,
     ListNotification,
     UpdateDestroyListNotification,
+    FragmentUpdateTranslate,
 )
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -62,11 +63,11 @@ urlpatterns = [
         name="list_text_fragments"),
     url(r'^api/v0/fragment/list/translator_fragments/(?P<username>\w+)/$', ListTranslatorFragments.as_view(),
         name="list_text_fragments"),
-    url(r'^api/v0/fragment/(?P<option>update|delete|detail)/(?P<pk>[0-9]+)$',
-        UpdateDestroyListFragment.as_view(),
+    url(r'^api/v0/fragment/(?P<option>update|delete|detail)/(?P<pk>[0-9]+)$', UpdateDestroyListFragment.as_view(),
         name="update_destroy_and_detail_fragment"),
-    url(r'^api/v0/fragment/add_translator/(?P<pk>[0-9]+)/$',
-        FragmentTranslatorRelation.as_view(),
+    url(r'^api/v0/fragment/add_translator/(?P<pk>[0-9]+)/$', FragmentTranslatorRelation.as_view(),
+        name="add_relation_fragment_translator"),
+    url(r'^api/v0/fragment/update_text/(?P<pk>[0-9]+)/$', FragmentUpdateTranslate.as_view(),
         name="add_relation_fragment_translator"),
     # Review
     url(r'^api/v0/review/create/$', AddNewReview.as_view(),
