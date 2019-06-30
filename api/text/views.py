@@ -1,83 +1,334 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from fragment.models import Fragment
-from text.models import Text
-from text.serializers import TextSerializer
+from text.permissions import ServiceAuthenticationDjango
+from rest_framework import serializers
+from text.utils import (
+    FragmentIterator,
+    percent_of_fragments,
+    get_all_fragments
+)
+from text.messages import Messages
+from rest_framework import generics
+from django.http import JsonResponse
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import (
+    IsAdminUser,
+)
+from text.models import (
+    Category,
+    Text,
+    TextFragment,
+    Review,
+    Observer,
+    ConcreteObserverAuthor,
+    Notification,
+)
+from text.serializers import (
+    # Serializer category
+    CategorySerializerAddAndUpdate,
+    CategorySerializerList,
+    # Serializer Text
+    TextSerializerAddAndUpdate,
+    TextSerializerList,
+    # Serializer Fragment
+    TextFragmentSerializerAddAndUpdate,
+    TextFragmentSerializerList,
+    TextFragmentAddTranslatorSerializer,
+    TextFragmentUpdateTranslate,
+    # Serializer Review
+    ReviewSerializerAddAndUpdate,
+    ReviewSerializerList,
+    # Serializer Notification
+    NotificationSerializer,
+)
 from drf_yasg.utils import swagger_auto_schema
 
 
+MESSAGES = Messages()
 
-# Create your views here.
 
-class TextView(APIView):
+""" Category controller."""
 
-    @swagger_auto_schema(responses={200: "Ok"},
-                         operation_description="Add new text")
-    def get(self, request):
+
+# Create class
+class AddNewCategory(generics.CreateAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializerAddAndUpdate
+
+    @swagger_auto_schema(request_body=CategorySerializerAddAndUpdate,
+                         response={200: CategorySerializerAddAndUpdate},
+                         operation_description="Add new category"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
+
+# List class
+class ListCategories(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializerList
+
+
+# Update, detail, patch and destroy class
+class UpdateDestroyListCategory(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializerList
+
+
+""" Text controller"""
+
+# Create class
+class AddNewText(generics.CreateAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Text.objects.all()
+    serializer_class = TextSerializerAddAndUpdate
+
+    @swagger_auto_schema(request_body=TextSerializerAddAndUpdate,
+                         response={200: TextSerializerAddAndUpdate},
+                         operation_description="Add new text"
+    )
+
+    def perform_create(self, serializer):
+        data = self.request.data
+        serializer.save()
+        fragments = data['fragments']
+        id_text = serializer.data['id']
+        text = Text.objects.get(id=id_text)
+        text.init()
         try:
-            data = request.data
-            author = data['author']
-            texts = Text.objects.filter(author=author)
-            serializer = TextSerializer(texts, many=True)
-            return Response(serializer.data)
-        except:
-            return Response('Send me a JSON', status=status.HTTP_400_BAD_REQUEST)
+            _ = [done for done in FragmentIterator(fragments, text)]
+        except Exception as erro:
+            raise serializers.ValidationError(erro)
+        text.save_fragments()
+        return JsonResponse({'status': True,
+                             'message': MESSAGES.SUCESS_SAVE_TEXT})
 
-    @swagger_auto_schema(request_body=TextSerializer,
-                         responses={200: "Ok"},
-                         operation_description="Add new text")
-    def post(self, request):
-        data = request.data
-        text_content = data['text_content']
-        breakpoints = data['breakpoints']
-        serializer = TextSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            self.fragment_text(text_content, breakpoints, serializer.data['id'])
-            return Response('Text successfully inserted', status=status.HTTP_201_CREATED)
-        else:
-            print(serializer.errors)
-            return Response('Invalid data', status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(request_body=TextSerializer,
-                         responses={200: "Ok"},
-                         operation_description="Fragment text")
-    def fragment_text(self, text_content, breakpoints, id_text):
-        '''
-        Receives a id_text and splits it into fragments, according to breakpoints
-        '''
+# List translated text
+class ListTranslatedText(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextSerializerList
 
-        text = Text.objects.get(id = id_text)
-        break_point = 0
-        for i in breakpoints:
-            fragment_content = text_content[break_point:i]
-            break_point = i
-            self.create_fragment(fragment_content, text)
-        last_fragment_content = text_content[break_point:]
-        self.create_fragment(last_fragment_content, text)
-        text.total_fragments = len(breakpoints) + 1
+    def get_queryset(self):
+        id_text = self.kwargs['id_text']
+        text = Text.objects.get(id=id_text)
+        text.init()
+
+        get_all_fragments(text)
+        text.translated_text = text.get_content()
         text.save()
+        return [text]
 
-    @swagger_auto_schema(request_body=TextSerializer,
-                         responses={200: "Ok"},
-                         operation_description="Add new fragment")
-    def create_fragment(self, fragment_content, text):
-        '''
-        Receives a fragment and saves it in database
-        '''
-        fragment = Fragment.objects.create(
-            content = fragment_content,
-            value = len(fragment_content)*0.1,
-            text = text
+# List class
+class ListTextsByAuthor(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextSerializerList
+
+    def get_queryset(self):
+        author = self.kwargs['author']
+        texts = Text.objects.filter(author=author)
+        return texts
+
+
+# Update, detail, patch and destroy class
+class UpdateDestroyListText(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Text.objects.all()
+    serializer_class = TextSerializerList
+
+
+""" Fragment."""
+
+
+# Create class
+class AddNewFragment(generics.CreateAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentSerializerAddAndUpdate
+
+    @swagger_auto_schema(request_body=TextFragmentSerializerAddAndUpdate,
+                         response={200: TextFragmentAddTranslatorSerializer},
+                         operation_description="Add new fragment"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+# List class
+class GenericListFragments(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextFragmentSerializerList
+    filter_backends = (DjangoFilterBackend,)
+
+class ListFragmentsByText(GenericListFragments):
+    """
+    Filter fragments by text id
+    """
+
+    def get_queryset(self):
+        text_id = self.kwargs['text_id']
+        queryset = TextFragment.objects.filter(
+            text__id=text_id
         )
+        return queryset
+
+class ListAvailableFragments(GenericListFragments):
+    """
+    List available fragments to translate or review
+    """
+
+    filterset_fields = ('text__language', 'text__categories', 'text__level')
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        queryset = TextFragment.objects.exclude(
+            fragment_translator=username
+        ).exclude(
+            text__author=username
+        )
+        return queryset
+
+class ListTranslatorFragments(GenericListFragments):
+    """
+    List all fragments a translator is translating
+    """
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        queryset = TextFragment.objects.filter(
+            fragment_translator=username
+        )
+        return queryset
 
 
-# {
-#     "text_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam ut tristique ligula. Donec mollis lorem elementum purus semper convallis. Etiam ac lectus ac dolor tempus pellentesque non eu enim. Integer venenatis neque eget massa blandit, iaculis tincidunt tellus egestas. Nunc finibus, elit at sagittis sodales, velit ligula malesuada nulla, eget mollis turpis ipsum sed mi. Cras non condimentum lectus. Suspendisse potenti. Mauris nulla sapien, tempor eget ipsum et, vehicula imperdiet massa. Praesent sed vehicula nulla. Proin sagittis consequat lacus sit amet suscipit. Etiam a risus vel leo venenatis ultricies at semper ante. Maecenas sed odio mauris.",
-#     "context": "Hello World",
-#     "author": 1,
-#     "language": 1,
-#     "category": [1],
-#     "breakpoints": [50, 100, 150, 250, 400, 500]
-# }
+
+# Update, detail, patch and destroy class
+class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentSerializerAddAndUpdate
+
+    def perform_update(self, serializer):
+        fragment_id = self.kwargs['pk']
+        next_state = self.request.data['state']
+        instanced_fragment = TextFragment.objects.get(id=fragment_id)
+        instanced_fragment.notify_observers(next_state)
+        serializer.save()
+
+class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentAddTranslatorSerializer
+
+    def perform_update(self, serializer):
+        """
+        Verify fragment's percent can person allow to get.
+        """
+        fragment_id = self.kwargs['pk']
+        instanced_fragment = TextFragment.objects.get(id=fragment_id)
+        text_id = instanced_fragment.text
+        data = self.request.data
+        if not percent_of_fragments(data['fragment_translator'],
+                                    text_id):
+            raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
+        next_state = data['state']
+        
+        instanced_fragment.notify_observers(next_state)
+        serializer.save()
+
+
+class FragmentUpdateTranslate(generics.UpdateAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentUpdateTranslate
+
+    def perform_update(self, serializer):
+        """
+        Update text that is being translated, for a routine
+        save or for sending the final translation
+        """
+        fragment_id = self.kwargs['pk']
+        next_state = self.request.data['state']
+        instanced_fragment = TextFragment.objects.get(id=fragment_id)
+        instanced_fragment.notify_observers(next_state)
+        serializer.save()
+
+
+class FragmentToReview(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextFragmentSerializerList
+
+    def get_queryset(self):
+        """
+        Filter queryset to not get fragments with the same translator and
+        author to review.
+        """
+        username = self.kwargs['username']
+        texts = Text.objects.filter(author=username)
+        id_texts = [text.id for text in texts]
+        fragments = TextFragment.objects.exclude(
+            fragment_translator=username
+        ).exclude(
+            text__in=id_texts
+        )
+        return fragments
+
+
+
+""" Review."""
+
+
+# Create class
+class AddNewReview(generics.CreateAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializerAddAndUpdate
+
+    def perform_create(self, serializer):
+        """
+        Verify if reviewer can get the fragment.
+        """
+        instance = serializer.validated_data
+        fragment = instance['fragment']
+        state_fragment = '2'
+        if (instance['approve'] == True):
+            state_fragment = '4'    
+        fragment.notify_observers(state_fragment)
+        fragment.state = state_fragment
+        fragment.save()
+        translator = fragment.fragment_translator
+        text_author = fragment.text.author
+        # The translator and review is the same
+        if instance['review_username'] == translator:
+            raise serializers.ValidationError(MESSAGES.ERRO_SAME_USER)
+        # The review and author is the same
+        if instance['review_username'] == text_author:
+            raise serializers.ValidationError(MESSAGES.ERRO_SAME_AUTHOR)
+        serializer.save()
+
+# List class
+class ListReviews(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializerList
+
+
+# Update, detail, patch and destroy class
+class UpdateDestroyListReview(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializerList
+
+""" Notification."""
+
+# List Notification
+class ListNotification(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+
+# Update, detail, patch and destroy class
+class UpdateDestroyListNotification(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer

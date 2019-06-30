@@ -20,24 +20,18 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 schema_view = get_schema_view(
-    openapi.Info(
-        title = 'Translate.me API',
-        default_version='v0',
-        description = 'Mudar depois',
-
-    ),
-       public=True,
+   openapi.Info(
+      title="Translate.me API",
+      default_version='v0',
+      description="Translate.me  - This API contains all the main operations for the application flow.",
+   ),
+   public=True,
    permission_classes=(AllowAny,),
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('text_frag/', include('text_frag.urls')),
     path('text/', include('text.urls')),
-    path('fragment/', include('fragment.urls')),
-    path('category/', include('category.urls')),
     path('', schema_view.with_ui('swagger', cache_timeout=0)),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0)),
-    path('comment/', include('comment.urls'))
-
 ]
