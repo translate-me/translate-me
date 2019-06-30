@@ -237,27 +237,19 @@ class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
         fragment.change_state('2')
         fragment.save()
 
+class FragmentTranslatorTranslationRefused(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Ends translator relation to fragment
+    """
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentAddTranslatorSerializer
 
-# class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
-#     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-#     queryset = TextFragment.objects.all()
-#     serializer_class = TextFragmentAddTranslatorSerializer
-
-#     def perform_update(self, serializer):
-#         """
-#         Verify fragment's percent can person allow to get.
-#         """
-#         fragment_id = self.kwargs['pk']
-#         instanced_fragment = TextFragment.objects.get(id=fragment_id)
-#         text_id = instanced_fragment.text
-#         data = self.request.data
-#         if not percent_of_fragments(data['fragment_translator'],
-#                                     text_id):
-#             raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
-#         next_state = data['state']
-        
-#         instanced_fragment.notify_observers(next_state)
-#         serializer.save()
+    def perform_update(self, serializer):
+        serializer.validated_data['fragment_translator'] =  None
+        fragment = serializer.save()
+        fragment.change_state('2.1')
+        fragment.save()
 
 
 class FragmentUpdateTranslate(generics.UpdateAPIView):
