@@ -4,8 +4,7 @@ from django.db import models
 # from django.dispatch import receiver
 from typing import List
 
-from text.state import TranslatingState
-
+from text.state import TranslationAssigned, TranslationRefused, WaitingReview, Reviewing, ToFinish, Finished
 
 
 CHOICES = (
@@ -124,10 +123,22 @@ class TextFragment(TextComponent):
             i.notify(self, self.state, next_state)
     
     def change_state(self, next_state):
+        state = None
         if next_state == '2':
-            state = TranslatingState()
-            state.change_state(self)
+            state = TranslationAssigned()
+        elif next_state == '2.1':
+            state = TranslationRefused()
+        elif next_state == '3':
+            state = WaitingReview()
+        elif next_state == '4':
+            state = Reviewing()
+        elif next_state == '5':
+            state = ToFinish()
+        elif next_state == '6':
+            state = Finished()
 
+        if state:
+            state.change_state(self)
 
 """ Review."""
 
