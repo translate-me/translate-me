@@ -101,7 +101,7 @@ class ReviewSerializerAddAndUpdate(serializers.ModelSerializer):
             'fragment',
             'review_username',
             'comment',
-            'approve'
+            'approve',
         ]
 
 

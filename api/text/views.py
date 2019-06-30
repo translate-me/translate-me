@@ -290,7 +290,12 @@ class AddNewReview(generics.CreateAPIView):
         """
         instance = serializer.validated_data
         fragment = instance['fragment']
-        fragment.notify_observers(instance['state'])
+        state_fragment = '2'
+        if (instance['approve'] == True):
+            state_fragment = '4'    
+        fragment.notify_observers(state_fragment)
+        fragment.state = state_fragment
+        fragment.save()
         translator = fragment.fragment_translator
         text_author = fragment.text.author
         # The translator and review is the same

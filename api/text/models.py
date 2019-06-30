@@ -225,9 +225,6 @@ class ConcreteObserverRevisor(Observer):
 
 
 
-
-
-
 class Notification(models.Model):
     text_id = models.ForeignKey(Text, on_delete=models.SET_NULL,null=True)
     target_username = models.CharField(max_length=50, null=False, blank=False)
