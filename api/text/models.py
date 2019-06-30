@@ -4,6 +4,9 @@ from django.db import models
 # from django.dispatch import receiver
 from typing import List
 
+from text.state import TranslatingState
+
+
 
 CHOICES = (
     ('1', 'To translate'),
@@ -97,7 +100,7 @@ class TextFragment(TextComponent):
                              default='1', null=False, blank=False)
     total_reviews = models.IntegerField(default=0)
     position = models.IntegerField(blank=True, null=True)
-    translated_fragment = models.TextField(default="")
+    translated_fragment = models.TextField(default="", blank=True, null=True)
     fragment_translator = models.CharField(max_length=50, null=True,
                                            blank=True)
     total_words = models.IntegerField(blank=True)
@@ -118,7 +121,12 @@ class TextFragment(TextComponent):
         list_observer = [oberserver_author, oberserver_revisor, oberserver_translator]
 
         for i in list_observer:
-            i.notify(self.pk, self.state, next_state)
+            i.notify(self, self.state, next_state)
+    
+    def change_state(self, next_state):
+        if next_state == '2':
+            state = TranslatingState()
+            state.change_state(self)
 
 
 
@@ -141,7 +149,7 @@ class Observer(models.Model):
 
     observer_type = models.CharField(max_length=50, default='Nada')
 
-    def notify(self, fragment_id, previous_state, actual_state) -> None:
+    def notify(self, fragment, previous_state, actual_state) -> None:
         pass
 
     class Meta:
@@ -152,7 +160,7 @@ class ConcreteObserverAuthor(Observer):
 
     observer_type = "Author"
 
-    def notify(self, fragment_id, previous_state, actual_state) -> None:
+    def notify(self, fragment, previous_state, actual_state) -> None:
         message = "empty"
         if (previous_state == '1') and (actual_state == '2'):
             message = "One of your fragments have been assigned!"
@@ -162,11 +170,11 @@ class ConcreteObserverAuthor(Observer):
             message = "Building up! A Fragment translation is complete!"
         else:
             return
-        parent_fragment = TextFragment.objects.get(id=fragment_id)
-        parent_text = parent_fragment.text
+        # parent_fragment = TextFragment.objects.get(id=fragment_id)
+        parent_text = fragment.text
 
         notification = Notification()
-        notification.text_id = parent_fragment.text
+        notification.text_id = fragment.text
         notification.target_username = parent_text.author
         notification.message = message
 
@@ -178,7 +186,7 @@ class ConcreteObserverTranslator(Observer):
 
     observer_type = "Translator"
 
-    def notify(self, fragment_id, previous_state, actual_state) -> None:
+    def notify(self, fragment, previous_state, actual_state) -> None:
         message = "empty"
         if (previous_state == '3') and (actual_state == '4'):
             message = "Your Translation is being reviewed!"
@@ -186,11 +194,11 @@ class ConcreteObserverTranslator(Observer):
             message = "Oops! There are some corrections to make on your translation."
         else:
             return
-        parent_fragment = TextFragment.objects.get(id=fragment_id)
+        # parent_fragment = TextFragment.objects.get(id=fragment_id)
 
         notification = Notification()
-        notification.text_id = parent_fragment.text
-        notification.target_username = parent_fragment.fragment_translator
+        notification.text_id = fragment.text
+        notification.target_username = fragment.fragment_translator
         notification.message = message
 
         notification.save()
@@ -201,16 +209,16 @@ class ConcreteObserverRevisor(Observer):
 
     observer_type = "Revisor"
 
-    def notify(self, fragment_id, previous_state, actual_state) -> None:
+    def notify(self, fragment, previous_state, actual_state) -> None:
         message = "empty"
         if (previous_state == '5') and (actual_state == '6'):
             message = "Hooray! One of your reviews got accepted!"
         else:
             return
-        parent_fragment = TextFragment.objects.get(id=fragment_id)
+        # parent_fragment = TextFragment.objects.get(id=fragment_id)
         reviews = []
         try:
-            reviews = Review.objects.all().filter(fragment=fragment_id)
+            reviews = Review.objects.all().filter(fragment=fragment.id)
             print(reviews)
 
         except Review.DoesNotExist:
@@ -218,7 +226,7 @@ class ConcreteObserverRevisor(Observer):
 
         for review in reviews:
             notification = Notification()
-            notification.text_id = parent_fragment.text
+            notification.text_id = fragment.text
             notification.target_username = review.review_username
             notification.message = message
             notification.save()
