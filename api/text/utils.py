@@ -13,6 +13,7 @@ def create_fragment(fragment, text):
         text_frag.body = body
         text_frag.price = len(body) * 0.1
         text_frag.text = text
+        text_frag.total_words = len(body.split())
         text.add(text_frag)
 
 

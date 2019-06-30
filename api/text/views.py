@@ -38,6 +38,8 @@ from text.serializers import (
     # Serializer Notification
     NotificationSerializer,
 )
+from drf_yasg.utils import swagger_auto_schema
+
 
 MESSAGES = Messages()
 
@@ -51,6 +53,12 @@ class AddNewCategory(generics.CreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializerAddAndUpdate
 
+    @swagger_auto_schema(request_body=CategorySerializerAddAndUpdate,
+                         response={200: CategorySerializerAddAndUpdate},
+                         operation_description="Add new category"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
 
 # List class
 class ListCategories(generics.ListAPIView):
@@ -74,6 +82,11 @@ class AddNewText(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Text.objects.all()
     serializer_class = TextSerializerAddAndUpdate
+
+    @swagger_auto_schema(request_body=TextSerializerAddAndUpdate,
+                         response={200: TextSerializerAddAndUpdate},
+                         operation_description="Add new text"
+    )
 
     def perform_create(self, serializer):
         data = self.request.data
@@ -132,6 +145,13 @@ class AddNewFragment(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = TextFragment.objects.all()
     serializer_class = TextFragmentSerializerAddAndUpdate
+
+    @swagger_auto_schema(request_body=TextFragmentSerializerAddAndUpdate,
+                         response={200: TextFragmentAddTranslatorSerializer},
+                         operation_description="Add new fragment"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
 
 
 # List class
