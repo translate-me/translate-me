@@ -202,22 +202,7 @@ class ListTranslatorFragments(GenericListFragments):
         return queryset
 
 
-
-# Update, detail, patch and destroy class
-class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    queryset = TextFragment.objects.all()
-    serializer_class = TextFragmentSerializerAddAndUpdate
-
-    def perform_update(self, serializer):
-        fragment_id = self.kwargs['pk']
-        next_state = self.request.data['state']
-        instanced_fragment = TextFragment.objects.get(id=fragment_id)
-        instanced_fragment.notify_observers(next_state)
-        serializer.save()
-
-
-class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
+class FragmentTranslatorRelation(generics.UpdateAPIView):
     """
     Assign translator relation to fragment
     """
@@ -237,7 +222,7 @@ class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
         fragment.change_state('2')
         fragment.save()
 
-class FragmentTranslatorTranslationRefused(generics.RetrieveUpdateDestroyAPIView):
+class FragmentTranslatorTranslationRefused(generics.UpdateAPIView):
     """
     Ends translator relation to fragment
     """
@@ -253,20 +238,22 @@ class FragmentTranslatorTranslationRefused(generics.RetrieveUpdateDestroyAPIView
 
 
 class FragmentUpdateTranslate(generics.UpdateAPIView):
+    """
+    Update text that is being translated. Updates it either as a routine or to
+    finish the translation
+    """
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = TextFragment.objects.all()
     serializer_class = TextFragmentUpdateTranslate
 
     def perform_update(self, serializer):
-        """
-        Update text that is being translated, for a routine
-        save or for sending the final translation
-        """
-        fragment_id = self.kwargs['pk']
-        next_state = self.request.data['state']
-        instanced_fragment = TextFragment.objects.get(id=fragment_id)
-        instanced_fragment.notify_observers(next_state)
         serializer.save()
+        status = self.request.data['done']
+        if status == "true":
+            id = self.kwargs['pk']
+            fragment = TextFragment.objects.get(id=id)
+            fragment.change_state('3')
+            fragment.save()
 
 
 class FragmentToReview(generics.ListAPIView):
