@@ -299,6 +299,16 @@ class RefuseReview(generics.DestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerList
 
+    def perform_destroy(self, serializer):
+        revision = Review.objects.get(id=self.kwargs['pk'])
+        fragment = revision.fragment
+        fragment.change_state('3')
+        fragment.save()
+        revision.delete()
+
+
+
+
 class UpdateReview(generics.UpdateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
