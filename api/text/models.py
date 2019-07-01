@@ -47,8 +47,6 @@ class TextComponent(models.Model):
 class Text(TextComponent):
     total_fragments = models.IntegerField(default=0)
     fragments_done = models.IntegerField(default=0)
-    fragments_revision = models.IntegerField(default=0)
-    fragments_doing = models.IntegerField(default=0)
     context = models.CharField(max_length=200, null=False, blank=False)
     author = models.CharField(max_length=50, null=False, blank=False)
     language = models.IntegerField(null=False, blank=False)

@@ -49,6 +49,7 @@ def get_all_fragments(text):
     """
     Inserts the text fragments in text
     """
+    text.init()
     text_fragments = TextFragment.objects.filter(text=text)
     for i in text_fragments:
         text.add(i)
@@ -68,3 +69,14 @@ def percent_of_fragments(username, text_id):
     if percent_of_text >= 0.3:
         return False
     return True
+
+def verify_last_state(text):
+    if text.fragments_done == text.total_fragments:
+        return True
+    return False
+
+def change_fragments_states(text):
+    get_all_fragments(text)
+    for i in text.children:
+        i.change_state('6')
+        i.save()
