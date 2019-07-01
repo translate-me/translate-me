@@ -54,7 +54,7 @@ class Text(TextComponent):
     categories = models.ManyToManyField(Category)
     translated_text = models.TextField(null=True, blank=True)
     price = models.FloatField(default=0)
-    deadline = models.DateTimeField(blank=True, null=True)
+    deadline = models.DateTimeField(default=None)
     level = models.CharField(max_length=7, choices=LEVELS,
                              default='1', null=False, blank=False)
 

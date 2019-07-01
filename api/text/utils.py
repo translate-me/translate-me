@@ -1,6 +1,6 @@
 """ Class to use methods that can't stay in views.py"""
 from text.models import TextFragment
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 def create_fragment(fragment, text):
@@ -83,6 +83,6 @@ def change_fragments_states(text):
         i.save()
 
 def create_deadline():
-    time_now = datetime.now()
+    time_now = datetime.now(timezone.utc)
     deadline = timedelta(weeks=2)
     return time_now + deadline
