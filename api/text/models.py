@@ -147,7 +147,7 @@ class Review(models.Model):
     fragment = models.ForeignKey(TextFragment, on_delete=models.SET_NULL,
                                  null=True)
     review_username = models.CharField(max_length=50, null=False, blank=False)
-    comment = models.TextField()
+    comment = models.TextField(blank=True, null=True)
     approve = models.BooleanField(default=False)
 
 

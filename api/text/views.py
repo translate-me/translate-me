@@ -201,6 +201,24 @@ class ListTranslatorFragments(GenericListFragments):
         )
         return queryset
 
+class FragmentToReview(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextFragmentSerializerList
+
+    def get_queryset(self):
+        """
+        Filter queryset to not get fragments with the same translator and
+        author to review.
+        """
+        username = self.kwargs['username']
+        texts = Text.objects.filter(author=username)
+        id_texts = [text.id for text in texts]
+        fragments = TextFragment.objects.exclude(
+            fragment_translator=username
+        ).exclude(
+            text__in=id_texts
+        )
+        return fragments
 
 class FragmentTranslatorRelation(generics.UpdateAPIView):
     """
@@ -236,7 +254,6 @@ class FragmentTranslatorTranslationRefused(generics.UpdateAPIView):
         fragment.change_state('2.1')
         fragment.save()
 
-
 class FragmentUpdateTranslate(generics.UpdateAPIView):
     """
     Update text that is being translated. Updates it either as a routine or to
@@ -249,63 +266,54 @@ class FragmentUpdateTranslate(generics.UpdateAPIView):
     def perform_update(self, serializer):
         serializer.save()
         status = self.request.data['done']
-        if status == "true":
+        if status == True:
             id = self.kwargs['pk']
             fragment = TextFragment.objects.get(id=id)
             fragment.change_state('3')
             fragment.save()
 
 
-class FragmentToReview(generics.ListAPIView):
-    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    serializer_class = TextFragmentSerializerList
-
-    def get_queryset(self):
-        """
-        Filter queryset to not get fragments with the same translator and
-        author to review.
-        """
-        username = self.kwargs['username']
-        texts = Text.objects.filter(author=username)
-        id_texts = [text.id for text in texts]
-        fragments = TextFragment.objects.exclude(
-            fragment_translator=username
-        ).exclude(
-            text__in=id_texts
-        )
-        return fragments
-
-
-
 """ Review."""
 
 
 # Create class
-class AddNewReview(generics.CreateAPIView):
+
+class AcceptReview(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerAddAndUpdate
 
     def perform_create(self, serializer):
-        """
-        Verify if reviewer can get the fragment.
-        """
-        instance = serializer.validated_data
-        fragment = instance['fragment']
-        state_fragment = '2'
-        if (instance['approve'] == True):
-            state_fragment = '4'    
-        fragment.notify_observers(state_fragment)
-        fragment.state = state_fragment
-        fragment.save()
-        translator = fragment.fragment_translator
-        text_author = fragment.text.author
-        # The translator and review is the same
-        if instance['review_username'] == translator:
+        fragment = serializer.validated_data['fragment']
+        username = serializer.validated_data['review_username']
+        if fragment.fragment_translator == username:
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_USER)
-        # The review and author is the same
-        if instance['review_username'] == text_author:
+        elif fragment.text.author == username:
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_AUTHOR)
+        fragment.change_state('4')
+        fragment.save()
+        serializer.save()
+
+class RefuseReview(generics.DestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializerList
+
+class UpdateReview(generics.UpdateAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializerAddAndUpdate
+
+    def perform_update(self, serializer):
+        status = self.request.data['done']
+        if status == True:
+            fragment = serializer.validated_data['fragment']
+            if serializer.validated_data['approve'] == True:
+                fragment.change_state('5')
+            else:
+                fragment.change_state('2')
+            fragment.total_reviews += 1
+            fragment.save()
         serializer.save()
 
 # List class

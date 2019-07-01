@@ -21,7 +21,7 @@ class TranslationRefused(StateInterface):
         fragment.state = state
 
 class WaitingReview(StateInterface):
-    
+
     def change_state(self, fragment):
         state = '3'
         fragment.notify_observers(state)
