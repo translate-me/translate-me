@@ -5,7 +5,8 @@ from text.utils import (
     percent_of_fragments,
     get_all_fragments,
     verify_last_state,
-    change_fragments_states
+    change_fragments_states,
+    create_deadline
 )
 from text.messages import Messages
 from rest_framework import generics
@@ -95,16 +96,16 @@ class AddNewText(generics.CreateAPIView):
         data = self.request.data
         text = serializer.save()
         fragments = data['fragments']
-        # id_text = serializer.data['id']
-        # text = Text.objects.get(id=id_text)
         text.init()
         try:
             _ = [done for done in FragmentIterator(fragments, text)]
         except Exception as erro:
             raise serializers.ValidationError(erro)
         text.total_fragments = len(fragments)
-        text.save()
         text.save_fragments()
+        text.price = text.get_price()
+        text.deadline = create_deadline()
+        text.save()
         return JsonResponse({'status': True,
                              'message': MESSAGES.SUCESS_SAVE_TEXT})
 
@@ -208,6 +209,14 @@ class ListTranslatorFragments(GenericListFragments):
             fragment_translator=username
         )
         return queryset
+
+class ListFragmentsById(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextFragmentSerializerList
+
+    def get_queryset(self):
+        fragment = TextFragment.objects.get(id=self.kwargs['fragment_id'])
+        return [fragment]
 
 class FragmentToReview(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
