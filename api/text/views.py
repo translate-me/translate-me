@@ -182,7 +182,7 @@ class ListFragmentsByText(GenericListFragments):
         )
         return queryset
 
-class ListAvailableFragments(GenericListFragments):
+class ListAvailableFragmentsTranslator(GenericListFragments):
     """
     List available fragments to translate
     """
@@ -190,15 +190,27 @@ class ListAvailableFragments(GenericListFragments):
     filterset_fields = ('text__language', 'text__categories', 'text__level')
 
     def get_queryset(self):
-        username = self.kwargs['username']
         queryset = TextFragment.objects.filter(
             fragment_translator=None
         )
-        # queryset = TextFragment.objects.exclude(
-        #     fragment_translator=username
-        # ).exclude(
-        #     text__author=username
-        # )
+        return queryset
+
+class ListAvailableFragmentsReviewer(GenericListFragments):
+    """
+    List available fragments to review
+    """
+
+    filterset_fields = ('text__language', 'text__categories', 'text__level')
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        queryset = TextFragment.objects.exclude(
+            fragment_translator=None
+        ).exclude(
+            fragment_translator=username
+        ).exclude(
+            text__author=username
+        )
         return queryset
 
 class ListTranslatorFragments(GenericListFragments):
