@@ -49,9 +49,12 @@ class Text(TextComponent):
     fragments_done = models.IntegerField(default=0)
     context = models.CharField(max_length=200, null=False, blank=False)
     author = models.CharField(max_length=50, null=False, blank=False)
+    title = models.CharField(default="", max_length=200)
     language = models.IntegerField(null=False, blank=False)
     categories = models.ManyToManyField(Category)
     translated_text = models.TextField(null=True, blank=True)
+    price = models.FloatField(default=0)
+    deadline = models.DateTimeField(blank=True, null=True)
     level = models.CharField(max_length=7, choices=LEVELS,
                              default='1', null=False, blank=False)
 

@@ -12,6 +12,7 @@ from text.views import (
 
     AddNewFragment,
     ListAvailableFragments,
+    ListFragmentsById,
     ListFragmentsByText,
     ListTranslatorFragments,
     # UpdateDestroyListFragment,
@@ -66,6 +67,8 @@ urlpatterns = [
     # Fragment
     url(r'^api/v0/fragment/create/$', AddNewFragment.as_view(),
         name="create_new_fragment"),
+    url(r'^api/v0/fragment/list/(?P<fragment_id>[0-9]+)$', ListFragmentsById.as_view(),
+        name="list_fragments_by_id"),
     url(r'^api/v0/fragment/list/fragments_by_text/(?P<text_id>[0-9]+)$', ListFragmentsByText.as_view(),
         name="list_text_fragments"),
     url(r'^api/v0/fragment/list/available_fragments/(?P<username>\w+)/$', ListAvailableFragments.as_view(),

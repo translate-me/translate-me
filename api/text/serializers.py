@@ -33,10 +33,12 @@ class TextSerializerAddAndUpdate(serializers.ModelSerializer):
         model = Text
         fields = [
             'id',
-            # 'body',
             'author',
             'total_fragments',
             'fragments_done',
+            'price',
+            'deadline',
+            'title',
             'context',
             'language',
             'categories',
@@ -67,6 +69,7 @@ class TextFragmentSerializerAddAndUpdate(serializers.ModelSerializer):
 
 
 class TextFragmentSerializerList(serializers.ModelSerializer):
+    text = TextSerializerList()
     class Meta:
         model = TextFragment
         fields = "__all__"
