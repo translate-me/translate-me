@@ -71,7 +71,7 @@ def percent_of_fragments(username, text_id):
     return True
 
 def verify_last_state(text):
-    if text.fragments_done == text.total_fragments:
+    if text.fragments_done >= text.total_fragments:
         return True
     return False
 

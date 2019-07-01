@@ -37,8 +37,6 @@ class TextSerializerAddAndUpdate(serializers.ModelSerializer):
             'author',
             'total_fragments',
             'fragments_done',
-            'fragments_revision',
-            'fragments_doing',
             'context',
             'language',
             'categories',

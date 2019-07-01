@@ -259,6 +259,7 @@ class FragmentTranslatorTranslationRefused(generics.UpdateAPIView):
     def perform_update(self, serializer):
         serializer.validated_data['fragment_translator'] =  None
         fragment = serializer.save()
+        fragment.translated_fragment = ""
         fragment.change_state('2.1')
         fragment.save()
 
