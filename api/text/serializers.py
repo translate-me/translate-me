@@ -37,8 +37,6 @@ class TextSerializerAddAndUpdate(serializers.ModelSerializer):
             'author',
             'total_fragments',
             'fragments_done',
-            'fragments_revision',
-            'fragments_doing',
             'context',
             'language',
             'categories',
@@ -79,7 +77,6 @@ class TextFragmentAddTranslatorSerializer(serializers.ModelSerializer):
         model = TextFragment
         fields = [
             'fragment_translator',
-            'state',
         ]
 
 
@@ -88,7 +85,6 @@ class TextFragmentUpdateTranslate(serializers.ModelSerializer):
         model = TextFragment
         fields = [
             'translated_fragment',
-            'state',
         ]
 
 """ Review."""
@@ -98,6 +94,7 @@ class ReviewSerializerAddAndUpdate(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = [
+            'id',
             'fragment',
             'review_username',
             'comment',

@@ -3,7 +3,9 @@ from rest_framework import serializers
 from text.utils import (
     FragmentIterator,
     percent_of_fragments,
-    get_all_fragments
+    get_all_fragments,
+    verify_last_state,
+    change_fragments_states
 )
 from text.messages import Messages
 from rest_framework import generics
@@ -39,6 +41,7 @@ from text.serializers import (
     # Serializer Notification
     NotificationSerializer,
 )
+
 from drf_yasg.utils import swagger_auto_schema
 
 
@@ -90,19 +93,26 @@ class AddNewText(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         data = self.request.data
-        serializer.save()
+        text = serializer.save()
         fragments = data['fragments']
-        id_text = serializer.data['id']
-        text = Text.objects.get(id=id_text)
+        # id_text = serializer.data['id']
+        # text = Text.objects.get(id=id_text)
         text.init()
         try:
             _ = [done for done in FragmentIterator(fragments, text)]
         except Exception as erro:
             raise serializers.ValidationError(erro)
+        text.total_fragments = len(fragments)
+        text.save()
         text.save_fragments()
         return JsonResponse({'status': True,
                              'message': MESSAGES.SUCESS_SAVE_TEXT})
 
+
+class ListTexts(generics.ListAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    serializer_class = TextSerializerList
+    queryset= Text.objects.all()
 
 # List translated text
 class ListTranslatedText(generics.ListAPIView):
@@ -112,7 +122,6 @@ class ListTranslatedText(generics.ListAPIView):
     def get_queryset(self):
         id_text = self.kwargs['id_text']
         text = Text.objects.get(id=id_text)
-        text.init()
 
         get_all_fragments(text)
         text.translated_text = text.get_content()
@@ -200,60 +209,6 @@ class ListTranslatorFragments(GenericListFragments):
         )
         return queryset
 
-
-
-# Update, detail, patch and destroy class
-class UpdateDestroyListFragment(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    queryset = TextFragment.objects.all()
-    serializer_class = TextFragmentSerializerAddAndUpdate
-
-    def perform_update(self, serializer):
-        fragment_id = self.kwargs['pk']
-        next_state = self.request.data['state']
-        instanced_fragment = TextFragment.objects.get(id=fragment_id)
-        instanced_fragment.notify_observers(next_state)
-        serializer.save()
-
-class FragmentTranslatorRelation(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    queryset = TextFragment.objects.all()
-    serializer_class = TextFragmentAddTranslatorSerializer
-
-    def perform_update(self, serializer):
-        """
-        Verify fragment's percent can person allow to get.
-        """
-        fragment_id = self.kwargs['pk']
-        instanced_fragment = TextFragment.objects.get(id=fragment_id)
-        text_id = instanced_fragment.text
-        data = self.request.data
-        if not percent_of_fragments(data['fragment_translator'],
-                                    text_id):
-            raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
-        next_state = data['state']
-        
-        instanced_fragment.notify_observers(next_state)
-        serializer.save()
-
-
-class FragmentUpdateTranslate(generics.UpdateAPIView):
-    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
-    queryset = TextFragment.objects.all()
-    serializer_class = TextFragmentUpdateTranslate
-
-    def perform_update(self, serializer):
-        """
-        Update text that is being translated, for a routine
-        save or for sending the final translation
-        """
-        fragment_id = self.kwargs['pk']
-        next_state = self.request.data['state']
-        instanced_fragment = TextFragment.objects.get(id=fragment_id)
-        instanced_fragment.notify_observers(next_state)
-        serializer.save()
-
-
 class FragmentToReview(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     serializer_class = TextFragmentSerializerList
@@ -273,38 +228,118 @@ class FragmentToReview(generics.ListAPIView):
         )
         return fragments
 
+class FragmentTranslatorRelation(generics.UpdateAPIView):
+    """
+    Assign translator relation to fragment
+    """
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentAddTranslatorSerializer
+
+    def perform_update(self, serializer):
+        """
+        Verify fragment's percent can person allow to get.
+        """
+        fragment = TextFragment.objects.get(id=self.kwargs['pk'])
+        translator = serializer.validated_data['fragment_translator']
+        if not percent_of_fragments(translator, fragment.text):
+            raise serializers.ValidationError(MESSAGES.ERROR_MORE_THAN_30)
+        fragment = serializer.save()
+        fragment.change_state('2')
+        fragment.save()
+
+class FragmentTranslatorTranslationRefused(generics.UpdateAPIView):
+    """
+    Ends translator relation to fragment
+    """
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentAddTranslatorSerializer
+
+    def perform_update(self, serializer):
+        serializer.validated_data['fragment_translator'] =  None
+        fragment = serializer.save()
+        fragment.translated_fragment = ""
+        fragment.change_state('2.1')
+        fragment.save()
+
+class FragmentUpdateTranslate(generics.UpdateAPIView):
+    """
+    Update text that is being translated. Updates it either as a routine or to
+    finish the translation
+    """
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = TextFragment.objects.all()
+    serializer_class = TextFragmentUpdateTranslate
+
+    def perform_update(self, serializer):
+        serializer.save()
+        status = self.request.data['done']
+        if status == True:
+            id = self.kwargs['pk']
+            fragment = TextFragment.objects.get(id=id)
+            fragment.change_state('3')
+            fragment.save()
 
 
 """ Review."""
 
 
 # Create class
-class AddNewReview(generics.CreateAPIView):
+
+class AcceptReview(generics.CreateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerAddAndUpdate
 
     def perform_create(self, serializer):
-        """
-        Verify if reviewer can get the fragment.
-        """
-        instance = serializer.validated_data
-        fragment = instance['fragment']
-        state_fragment = '2'
-        if (instance['approve'] == True):
-            state_fragment = '4'    
-        fragment.notify_observers(state_fragment)
-        fragment.state = state_fragment
-        fragment.save()
-        translator = fragment.fragment_translator
-        text_author = fragment.text.author
-        # The translator and review is the same
-        if instance['review_username'] == translator:
+        fragment = serializer.validated_data['fragment']
+        username = serializer.validated_data['review_username']
+        if fragment.fragment_translator == username:
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_USER)
-        # The review and author is the same
-        if instance['review_username'] == text_author:
+        elif fragment.text.author == username:
             raise serializers.ValidationError(MESSAGES.ERRO_SAME_AUTHOR)
+        fragment.change_state('4')
+        fragment.save()
         serializer.save()
+
+class RefuseReview(generics.DestroyAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializerList
+
+    def perform_destroy(self, serializer):
+        revision = Review.objects.get(id=self.kwargs['pk'])
+        fragment = revision.fragment
+        fragment.change_state('3')
+        fragment.save()
+        revision.delete()
+
+class UpdateReview(generics.UpdateAPIView):
+    permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializerAddAndUpdate
+
+    def perform_update(self, serializer):
+        status = self.request.data['done']
+        review = serializer.save()
+        fragment = review.fragment
+        text = fragment.text
+        if status == True:
+            if review.approve == True:
+                fragment.change_state('5')
+                text.fragments_done += 1
+                text.save()
+            else:
+                fragment.change_state('2')
+            fragment.total_reviews += 1
+            fragment.save()
+
+            if verify_last_state(text):
+                change_fragments_states(text)
+                text.translated_text = text.get_content()
+                text.save()
+
 
 # List class
 class ListReviews(generics.ListAPIView):
