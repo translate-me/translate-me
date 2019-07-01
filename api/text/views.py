@@ -207,6 +207,8 @@ class ListTranslatorFragments(GenericListFragments):
         username = self.kwargs['username']
         queryset = TextFragment.objects.filter(
             fragment_translator=username
+        ).filter(
+            state='2'
         )
         return queryset
 
