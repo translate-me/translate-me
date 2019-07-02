@@ -71,12 +71,26 @@ class ListCategories(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializerList
 
+    @swagger_auto_schema(request_body=CategorySerializerList,
+                         response={200: CategorySerializerList},
+                         operation_description="List categories"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
+
 
 # Update, detail, patch and destroy class
 class UpdateDestroyListCategory(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Category.objects.all()
     serializer_class = CategorySerializerList
+
+    @swagger_auto_schema(request_body=CategorySerializerList,
+                         response={200: CategorySerializerList},
+                         operation_description="Update/Destroy categories"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
 
 
 """ Text controller"""
@@ -115,10 +129,22 @@ class ListTexts(generics.ListAPIView):
     serializer_class = TextSerializerList
     queryset= Text.objects.all()
 
+    @swagger_auto_schema(request_body=TextSerializerList,
+                         response={200: TextSerializerList},
+                         operation_description="List text"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
+
 # List translated text
 class ListTranslatedText(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     serializer_class = TextSerializerList
+    
+    @swagger_auto_schema(request_body=TextSerializerList,
+                         response={200: TextSerializerList},
+                         operation_description="List translated text"
+    )
 
     def get_queryset(self):
         id_text = self.kwargs['id_text']
@@ -134,6 +160,12 @@ class ListTextsByAuthor(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     serializer_class = TextSerializerList
 
+    @swagger_auto_schema(request_body=TextSerializerList,
+                         response={200: TextSerializerList},
+                         operation_description="List text by author"
+    )
+
+
     def get_queryset(self):
         author = self.kwargs['author']
         texts = Text.objects.filter(author=author)
@@ -146,6 +178,12 @@ class UpdateDestroyListText(generics.RetrieveUpdateDestroyAPIView):
     queryset = Text.objects.all()
     serializer_class = TextSerializerList
 
+    @swagger_auto_schema(request_body=TextSerializerList,
+                         response={200: TextSerializerList},
+                         operation_description="Update/Destroy Text"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
 
 """ Fragment."""
 
@@ -170,10 +208,23 @@ class GenericListFragments(generics.ListAPIView):
     serializer_class = TextFragmentSerializerList
     filter_backends = (DjangoFilterBackend,)
 
+    @swagger_auto_schema(request_body=TextFragmentSerializerList,
+                         response={200: TextFragmentSerializerList},
+                         operation_description="List generic fragments"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
+
 class ListFragmentsByText(GenericListFragments):
     """
     Filter fragments by text id
     """
+    @swagger_auto_schema(request_body=TextFragmentSerializerList,
+                         response={200: TextFragmentSerializerList},
+                         operation_description="List fragment by text"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
 
     def get_queryset(self):
         text_id = self.kwargs['text_id']
@@ -202,6 +253,13 @@ class ListAvailableFragmentsReviewer(GenericListFragments):
 
     filterset_fields = ('text__language', 'text__categories', 'text__level')
 
+    @swagger_auto_schema(request_body=TextFragmentSerializerList,
+                         response={200: TextFragmentSerializerList},
+                         operation_description="List generic fragments"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
+
     def get_queryset(self):
         username = self.kwargs['username']
         queryset = TextFragment.objects.filter(
@@ -217,6 +275,13 @@ class ListTranslatorFragments(GenericListFragments):
     """
     List all fragments a translator is translating
     """
+
+    @swagger_auto_schema(request_body=TextFragmentSerializerList,
+                         response={200: TextFragmentSerializerList},
+                         operation_description="List translator of fragments"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
 
     def get_queryset(self):
         username = self.kwargs['username']
@@ -238,6 +303,13 @@ class ListFragmentsById(generics.ListAPIView):
 class FragmentToReview(generics.ListAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     serializer_class = TextFragmentSerializerList
+
+    @swagger_auto_schema(request_body=TextFragmentSerializerList,
+                         response={200: TextFragmentSerializerList},
+                         operation_description="List fragments to review"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
 
     def get_queryset(self):
         """
@@ -262,6 +334,10 @@ class FragmentTranslatorRelation(generics.UpdateAPIView):
     queryset = TextFragment.objects.all()
     serializer_class = TextFragmentAddTranslatorSerializer
 
+    @swagger_auto_schema(request_body=TextFragmentSerializerList,
+                         response={200: TextFragmentSerializerList},
+                         operation_description="Fragments translator relation"
+    )
     def perform_update(self, serializer):
         """
         Verify fragment's percent can person allow to get.
@@ -282,6 +358,11 @@ class FragmentTranslatorTranslationRefused(generics.UpdateAPIView):
     queryset = TextFragment.objects.all()
     serializer_class = TextFragmentAddTranslatorSerializer
 
+    @swagger_auto_schema(request_body=TextFragmentSerializerList,
+                         response={200: TextFragmentSerializerList},
+                         operation_description="Translator translation refused"
+    )
+
     def perform_update(self, serializer):
         serializer.validated_data['fragment_translator'] =  None
         fragment = serializer.save()
@@ -297,6 +378,13 @@ class FragmentUpdateTranslate(generics.UpdateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = TextFragment.objects.all()
     serializer_class = TextFragmentUpdateTranslate
+
+    @swagger_auto_schema(request_body=TextFragmentSerializerList,
+                         response={200: TextFragmentSerializerList},
+                         operation_description="Update translate"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
 
     def perform_update(self, serializer):
         serializer.save()
@@ -318,6 +406,10 @@ class AcceptReview(generics.CreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerAddAndUpdate
 
+    @swagger_auto_schema(request_body=ReviewSerializerAddAndUpdate,
+                         response={200: ReviewSerializerAddAndUpdate},
+                         operation_description="Accept Review"
+    )
     def perform_create(self, serializer):
         fragment = serializer.validated_data['fragment']
         username = serializer.validated_data['review_username']
@@ -333,6 +425,11 @@ class RefuseReview(generics.DestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerList
+    
+    @swagger_auto_schema(request_body=ReviewSerializerList,
+                         response={200: ReviewSerializerList},
+                         operation_description="Accept Review"
+    )
 
     def perform_destroy(self, serializer):
         revision = Review.objects.get(id=self.kwargs['pk'])
@@ -345,6 +442,11 @@ class UpdateReview(generics.UpdateAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerAddAndUpdate
+
+    @swagger_auto_schema(request_body=ReviewSerializerAddAndUpdate,
+                         response={200: ReviewSerializerAddAndUpdate},
+                         operation_description="Update Review"
+    )
 
     def perform_update(self, serializer):
         status = self.request.data['done']
@@ -373,12 +475,26 @@ class ListReviews(generics.ListAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerList
 
+    @swagger_auto_schema(request_body=ReviewSerializerList,
+                         response={200: ReviewSerializerList},
+                         operation_description="List Review"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
+
 
 # Update, detail, patch and destroy class
 class UpdateDestroyListReview(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializerList
+
+    @swagger_auto_schema(request_body=ReviewSerializerList,
+                         response={200: ReviewSerializerList},
+                         operation_description="Update/Destroy Review"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
 
 """ Notification."""
 
@@ -388,8 +504,21 @@ class ListNotification(generics.ListAPIView):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
 
+    @swagger_auto_schema(request_body=NotificationSerializer,
+                         response={200: NotificationSerializer},
+                         operation_description="List Notification"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
+
 # Update, detail, patch and destroy class
 class UpdateDestroyListNotification(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser | ServiceAuthenticationDjango]
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
+    @swagger_auto_schema(request_body=NotificationSerializer,
+                         response={200: NotificationSerializer},
+                         operation_description="Update/Destroy Notification"
+    )
+    def perform_create(self, serializer):
+        serializer.save()
