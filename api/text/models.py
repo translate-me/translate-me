@@ -47,11 +47,14 @@ class TextComponent(models.Model):
 class Text(TextComponent):
     total_fragments = models.IntegerField(default=0)
     fragments_done = models.IntegerField(default=0)
-    context = models.CharField(max_length=200, null=False, blank=False)
+    context = models.TextField(null=False, blank=False)
     author = models.CharField(max_length=50, null=False, blank=False)
+    title = models.CharField(default="", max_length=200)
     language = models.IntegerField(null=False, blank=False)
     categories = models.ManyToManyField(Category)
     translated_text = models.TextField(null=True, blank=True)
+    price = models.FloatField(default=0, blank=True)
+    deadline = models.DateTimeField(blank=True, null=True)
     level = models.CharField(max_length=7, choices=LEVELS,
                              default='1', null=False, blank=False)
 
@@ -89,7 +92,7 @@ class Text(TextComponent):
 
 
 class TextFragment(TextComponent):
-    text = models.ForeignKey(Text, on_delete=models.SET_NULL,
+    text = models.ForeignKey(Text, on_delete=models.CASCADE,
                              null=True)
     body = models.TextField(null=False, blank=False)
     price = models.FloatField(default=0)

@@ -57,9 +57,11 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = [
+    'http://0.0.0.0:3000',
+    'http://localhost:3000'
 ]
 
 ROOT_URLCONF = 'api.urls'
