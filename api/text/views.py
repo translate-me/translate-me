@@ -191,7 +191,7 @@ class ListAvailableFragmentsTranslator(GenericListFragments):
 
     def get_queryset(self):
         queryset = TextFragment.objects.filter(
-            fragment_translator=None
+            state='1'
         )
         return queryset
 
@@ -204,8 +204,8 @@ class ListAvailableFragmentsReviewer(GenericListFragments):
 
     def get_queryset(self):
         username = self.kwargs['username']
-        queryset = TextFragment.objects.exclude(
-            fragment_translator=None
+        queryset = TextFragment.objects.filter(
+            state='3'
         ).exclude(
             fragment_translator=username
         ).exclude(
