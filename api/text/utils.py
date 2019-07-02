@@ -1,5 +1,6 @@
 """ Class to use methods that can't stay in views.py"""
 from text.models import TextFragment
+from datetime import datetime, timedelta, timezone
 
 
 def create_fragment(fragment, text):
@@ -11,7 +12,7 @@ def create_fragment(fragment, text):
         body = fragment['body']
         text_frag = TextFragment()
         text_frag.body = body
-        text_frag.price = len(body) * 0.1
+        text_frag.price = len(body.split(' ')) * 0.4
         text_frag.text = text
         text_frag.total_words = len(body.split())
         text.add(text_frag)
@@ -49,6 +50,7 @@ def get_all_fragments(text):
     """
     Inserts the text fragments in text
     """
+    text.init()
     text_fragments = TextFragment.objects.filter(text=text)
     for i in text_fragments:
         text.add(i)
@@ -68,3 +70,19 @@ def percent_of_fragments(username, text_id):
     if percent_of_text >= 0.3:
         return False
     return True
+
+def verify_last_state(text):
+    if text.fragments_done >= text.total_fragments:
+        return True
+    return False
+
+def change_fragments_states(text):
+    get_all_fragments(text)
+    for i in text.children:
+        i.change_state('6')
+        i.save()
+
+def create_deadline():
+    time_now = datetime.now(timezone.utc)
+    deadline = timedelta(weeks=2)
+    return time_now + deadline
